@@ -1582,6 +1582,37 @@
   position: absolute !important;
   z-index: 9999999 !important;
 }
+    /* QUANTIDADE DO ITEM - DIGITAÇÃO LIVRE E SEM BUG */
+
+.input-qtd-item {
+  width: 100% !important;
+  height: 42px !important;
+  min-height: 42px !important;
+  border-radius: 12px !important;
+  text-align: center !important;
+  font-size: 17px !important;
+  font-weight: 900 !important;
+  color: #12345a !important;
+  background: #ffffff !important;
+  border: 1px solid #d9e5f2 !important;
+  padding: 7px 8px !important;
+  box-shadow: none !important;
+}
+
+.input-qtd-item:focus {
+  border-color: var(--azul) !important;
+  box-shadow: 0 0 0 4px rgba(0, 87, 184, 0.10) !important;
+}
+
+.orc-item-modern-grid {
+  grid-template-columns: 120px minmax(0, 1fr) !important;
+}
+
+@media (max-width: 700px) {
+  .orc-item-modern-grid {
+    grid-template-columns: 1fr !important;
+  }
+}
   </style>
 </head>
 
@@ -2751,19 +2782,20 @@
       atualizarPreview();
     }
 
-    function alterarQtd(id, qtd) {
-      const item = itensOrcamento.find((i) => i.id === id);
+   function alterarQtd(id, qtd) {
+  const item = itensOrcamento.find((i) => i.id === id);
 
-      if (!item) return;
+  if (!item) return;
 
-      const q = parseInt(qtd || "1", 10);
+  const quantidadeLimpa = String(qtd || "").replace(/[^0-9]/g, "");
+  const q = parseInt(quantidadeLimpa || "1", 10);
 
-      item.quantidade = !Number.isInteger(q) || q < 1 ? 1 : q;
-      item.subtotal = item.quantidade * Number(item.valor || 0);
+  item.quantidade = !Number.isInteger(q) || q < 1 ? 1 : q;
+  item.subtotal = item.quantidade * Number(item.valor || 0);
 
-      renderItens();
-      atualizarPreview();
-    }
+  renderItens();
+  atualizarPreview();
+}
 
     function valorParaNumero(valor) {
       let texto = String(valor || "0").trim();
@@ -2830,13 +2862,15 @@
               <div class="orc-item-modern-grid">
                 <div class="orc-item-modern-field quantidade">
                   <label>Qtd.</label>
-                  <input
-                    type="number"
-                    step="1"
-                    min="1"
-                    value="${i.quantidade}"
-                    onchange="alterarQtd('${i.id}', this.value)"
-                  >
+                <input
+  class="input-qtd-item"
+  type="text"
+  inputmode="numeric"
+  value="${i.quantidade}"
+  oninput="this.value = this.value.replace(/[^0-9]/g, '')"
+  onblur="alterarQtd('${i.id}', this.value)"
+  onkeydown="if(event.key === 'Enter'){ this.blur(); }"
+>
                 </div>
 
                 <div class="orc-item-modern-field valor-unitario">
