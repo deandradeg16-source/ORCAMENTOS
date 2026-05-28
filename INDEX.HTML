@@ -1,532 +1,15 @@
-
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
   <title>Orçamentos ViaTec</title>
+
+  <!-- Biblioteca mantida para compatibilidade caso queira voltar ao PDF por HTML no futuro -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
   <style>
-    :root{--azul:#0057b8;--azul-escuro:#003b7a;--verde:#00a859;--verde-escuro:#007a41;--texto:#1f2937;--muted:#6b7280;--borda:#d8e3f0;--vermelho:#dc2626;--sombra:0 12px 30px rgba(0,43,92,.12)}
-    *{box-sizing:border-box}body{margin:0;font-family:Arial,Helvetica,sans-serif;color:var(--texto);background:linear-gradient(135deg,#eaf3ff,#e8fff4)}
-    header{background:linear-gradient(90deg,var(--azul),var(--verde));color:white;padding:18px 22px;display:flex;justify-content:space-between;align-items:center;gap:14px;flex-wrap:wrap}header h1{margin:0;font-size:22px}header small{opacity:.9}
-    .tabs{display:flex;gap:8px;flex-wrap:wrap;padding:14px 18px;background:rgba(255,255,255,.8);position:sticky;top:0;z-index:10;backdrop-filter:blur(8px);border-bottom:1px solid var(--borda)}
-    .tabs button,.btn{border:0;border-radius:12px;padding:11px 14px;font-weight:800;cursor:pointer;font-size:14px}.tabs button{background:white;color:var(--azul-escuro);border:1px solid var(--borda)}.tabs button.active{background:var(--azul);color:white;border-color:var(--azul)}
-    .wrap{padding:18px;max-width:1400px;margin:0 auto}.section{display:none}.section.active{display:block}.grid{display:grid;gap:16px}.grid-2{grid-template-columns:420px 1fr;align-items:start}.card{background:white;border:1px solid rgba(0,87,184,.08);border-radius:18px;padding:18px;box-shadow:var(--sombra)}.card h2,.card h3{margin-top:0;color:var(--azul-escuro)}
-    label{display:block;font-weight:800;margin-bottom:6px;font-size:14px}input,select,textarea{width:100%;border:1px solid var(--borda);border-radius:12px;padding:11px 12px;font-size:15px;outline:none;background:white}textarea{min-height:80px;resize:vertical}input:focus,select:focus,textarea:focus{border-color:var(--azul);box-shadow:0 0 0 4px rgba(0,87,184,.1)}
-    .field{margin-bottom:12px}.row{display:grid;grid-template-columns:1fr 1fr;gap:10px}.actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}.btn-primary{background:var(--azul);color:white}.btn-success{background:var(--verde);color:white}.btn-light{background:#eaf3ff;color:var(--azul-escuro)}.btn-danger{background:var(--vermelho);color:white}
-    table{width:100%;border-collapse:collapse}th,td{padding:10px;border-bottom:1px solid #edf1f7;text-align:left;font-size:14px;vertical-align:top}th{background:#eaf3ff;color:var(--azul-escuro);font-size:12px;text-transform:uppercase}.money{font-weight:900;color:var(--azul-escuro)}.muted{color:var(--muted);font-size:13px}.status{display:inline-block;padding:5px 9px;border-radius:999px;background:#eaf3ff;color:var(--azul);font-weight:900;font-size:12px}
-    .totals{margin-top:14px;background:linear-gradient(135deg,#eaf3ff,#e8fff4);border-radius:16px;padding:14px}.total-line{display:flex;justify-content:space-between;margin:7px 0}.total-line.final{font-size:22px;font-weight:900;color:var(--azul-escuro);border-top:1px solid rgba(0,87,184,.18);padding-top:10px}
-    .preview-bar{display:flex;gap:8px;justify-content:space-between;align-items:center;flex-wrap:wrap;margin-bottom:12px}.empty-box{padding:18px;text-align:center;color:var(--muted);border:1px dashed var(--borda);border-radius:14px}
-    .item-card{background:white;border:1px solid #dbe7f4;border-left:5px solid var(--azul);border-radius:18px;padding:14px;margin-bottom:14px;box-shadow:0 10px 22px rgba(0,43,92,.08);overflow:hidden}.item-head{display:flex;justify-content:space-between;align-items:flex-start;gap:10px;border-bottom:1px solid #edf1f7;padding-bottom:10px;margin-bottom:12px}.item-title{font-size:15px;font-weight:900;color:var(--azul-escuro);line-height:1.25;word-break:break-word}.item-unit{display:inline-flex;margin-top:6px;padding:4px 9px;border-radius:999px;background:#eaf3ff;color:var(--azul-escuro);font-size:12px;font-weight:900}.btn-remove{background:#fff1f1;color:var(--vermelho);border:1px solid #fecaca;padding:9px 12px;white-space:nowrap}.btn-remove:hover{background:var(--vermelho);color:white}
-    .item-fields{display:grid;grid-template-columns:64px minmax(0,1fr) minmax(0,1fr);gap:7px;align-items:stretch}.item-field{min-width:0;background:#f8fbff;border:1px solid #edf1f7;border-radius:13px;padding:7px;overflow:hidden}.item-field label{font-size:10.5px;margin-bottom:5px;color:var(--muted);text-transform:uppercase;white-space:nowrap}.item-field input{width:100%;min-width:0;height:40px;font-size:14px;font-weight:800;padding:7px 8px}.item-field:first-child input{text-align:center;font-size:18px}.valor-editavel{text-align:right}.subtotal-box{height:40px;min-height:40px;background:#e8fff4;color:var(--verde-escuro);border:1px solid #c9f3dd;border-radius:12px;display:flex;align-items:center;justify-content:flex-end;padding:7px 8px;font-size:14px;font-weight:900;white-space:nowrap;overflow:hidden}
-    #previewOrcamento{background:white;min-height:900px;border-radius:14px;padding:30px;border:1px solid #e5e7eb;position:relative;overflow:hidden}#previewOrcamento.com-timbrado{background-size:cover;background-position:center top;background-repeat:no-repeat}#previewOrcamento.com-timbrado:before{content:"";position:absolute;inset:0;background:rgba(255,255,255,.1);pointer-events:none}#previewOrcamento>*{position:relative;z-index:1}
-    .orc-head{display:flex;justify-content:space-between;gap:18px;border-bottom:4px solid var(--azul);padding-bottom:16px;margin-bottom:18px}.company{display:flex;gap:12px}.logo-box{width:72px;height:72px;border-radius:14px;background:linear-gradient(135deg,var(--azul),var(--verde));color:white;display:flex;align-items:center;justify-content:center;font-size:24px;font-weight:900;flex:0 0 auto;overflow:hidden;border:1px solid #e5e7eb}.logo-box img{width:100%;height:100%;object-fit:contain;background:white;padding:4px}.company h2{margin:0;color:var(--azul-escuro);font-size:20px}.company p,.orc-info p{margin:3px 0;font-size:12px;color:#4b5563}.orc-info{text-align:right}.orc-info h1{margin:0 0 8px;color:var(--azul-escuro)}.box-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px}.box{border:1px solid #e5e7eb;border-radius:13px;padding:12px;background:rgba(255,255,255,.92)}.box h3{margin:0 0 8px;color:var(--azul-escuro);font-size:15px}.box p{margin:3px 0;font-size:13px}.preview-footer{border-top:1px solid #e5e7eb;margin-top:18px;padding-top:12px;font-size:12px;color:#4b5563}
-    .aprovacao-box{margin-top:16px;border:1px solid #c9f3dd;background:#e8fff4;border-radius:14px;padding:14px}.aprovacao-box h3{margin:0 0 8px;color:var(--verde-escuro);font-size:16px}.aprovacao-box p{margin:4px 0;font-size:13px}.whatsapp-aprovar{display:inline-flex;margin-top:10px;align-items:center;justify-content:center;gap:8px;padding:12px 16px;border-radius:14px;background:linear-gradient(135deg,#00a859,#007a41);color:white;text-decoration:none;font-weight:900;font-size:14px;box-shadow:0 8px 18px rgba(0,168,89,.25)}.whatsapp-aprovar:hover{background:var(--verde-escuro)}
-    @media(max-width:1000px){.grid-2,.row,.box-grid{grid-template-columns:1fr}.orc-head{flex-direction:column}.orc-info{text-align:left}}
-    @media(max-width:700px){.wrap{padding:12px}.card{padding:14px}.item-head{flex-direction:column}.btn-remove{width:100%}.item-fields{grid-template-columns:1fr}table.responsive,table.responsive thead,table.responsive tbody,table.responsive tr,table.responsive th,table.responsive td{display:block}table.responsive thead{display:none}table.responsive tr{border:1px solid #e5e7eb;border-radius:14px;margin-bottom:10px;overflow:hidden}table.responsive td{display:flex;justify-content:space-between;gap:10px}table.responsive td:before{content:attr(data-label);font-weight:900;color:var(--azul-escuro)}#previewOrcamento{padding:18px}}
-    @media print{@page{size:A4 portrait;margin:8mm}header,.tabs,.no-print,.form-card{display:none!important}html,body{background:white}.wrap{padding:0;max-width:none}.grid-2{display:block}.card{box-shadow:none;border:0;padding:0}#previewOrcamento{border:0;border-radius:0;min-height:auto;width:100%;max-width:100%;padding:0}.orc-head{padding-bottom:12px;margin-bottom:14px}.company h2{font-size:18px}.company p,.orc-info p{font-size:11px}.orc-info h1{font-size:25px}.logo-box{width:60px;height:60px}.box-grid{gap:10px;margin-bottom:12px}.box{padding:10px}.box h3{font-size:14px;margin-bottom:6px}.box p{font-size:12px}#previewOrcamento table th,#previewOrcamento table td{padding:7px 8px;font-size:12px}.totals{padding:10px;margin-top:10px}.total-line{font-size:13px;margin:5px 0}.total-line.final{font-size:19px;padding-top:8px}.aprovacao-box{padding:10px;margin-top:10px}.aprovacao-box h3{font-size:14px;margin-bottom:5px}.aprovacao-box p{font-size:12px}.whatsapp-aprovar{display:inline-flex;font-size:12px;padding:8px 10px}.preview-footer{font-size:10px;margin-top:10px;padding-top:8px}}
-  
-
-    /* =========================================================
-       REFINO VISUAL FINAL - UI mais elegante sem alterar funções
-       ========================================================= */
-
-    body {
-      background:
-        radial-gradient(circle at top left, rgba(0, 87, 184, 0.16), transparent 28%),
-        radial-gradient(circle at bottom right, rgba(0, 168, 89, 0.14), transparent 30%),
-        linear-gradient(135deg, #eef6ff, #f3fff8);
-    }
-
-    header {
-      padding: 22px 28px;
-      box-shadow: 0 10px 28px rgba(0, 43, 92, 0.16);
-    }
-
-    header h1 {
-      font-size: 24px;
-      letter-spacing: -0.02em;
-    }
-
-    header small {
-      display: block;
-      margin-top: 4px;
-      font-size: 13px;
-    }
-
-    .tabs {
-      padding: 12px 18px;
-      gap: 10px;
-      box-shadow: 0 8px 22px rgba(0, 43, 92, 0.07);
-    }
-
-    .tabs button {
-      border-radius: 999px;
-      padding: 11px 16px;
-      box-shadow: 0 4px 12px rgba(0, 43, 92, 0.05);
-      transition: transform 0.18s ease, box-shadow 0.18s ease, background 0.18s ease;
-    }
-
-    .tabs button:hover {
-      transform: translateY(-1px);
-      box-shadow: 0 8px 18px rgba(0, 43, 92, 0.12);
-    }
-
-    .tabs button.active {
-      background: linear-gradient(135deg, var(--azul), var(--azul-escuro));
-      box-shadow: 0 9px 20px rgba(0, 87, 184, 0.22);
-    }
-
-    .wrap {
-      padding: 22px;
-    }
-
-    .card {
-      border-radius: 22px;
-      padding: 22px;
-      border: 1px solid rgba(0, 87, 184, 0.10);
-      box-shadow: 0 18px 42px rgba(0, 43, 92, 0.12);
-    }
-
-    .card h2 {
-      font-size: 21px;
-      letter-spacing: -0.02em;
-      margin-bottom: 16px;
-      padding-bottom: 10px;
-      border-bottom: 1px solid #edf1f7;
-    }
-
-    .card h3 {
-      font-size: 17px;
-      margin-bottom: 12px;
-    }
-
-    label {
-      color: #334155;
-      font-size: 13px;
-      letter-spacing: 0.01em;
-    }
-
-    input,
-    select,
-    textarea {
-      border-radius: 14px;
-      border-color: #d9e4f1;
-      background: #fbfdff;
-      transition: border-color 0.18s ease, box-shadow 0.18s ease, background 0.18s ease;
-    }
-
-    input:hover,
-    select:hover,
-    textarea:hover {
-      background: #ffffff;
-      border-color: #bdd2ea;
-    }
-
-    input:focus,
-    select:focus,
-    textarea:focus {
-      background: #ffffff;
-      border-color: var(--azul);
-      box-shadow: 0 0 0 4px rgba(0, 87, 184, 0.10);
-    }
-
-    textarea {
-      line-height: 1.45;
-    }
-
-    .field {
-      margin-bottom: 14px;
-    }
-
-    .row {
-      gap: 12px;
-    }
-
-    .actions {
-      gap: 10px;
-      margin-top: 14px;
-    }
-
-    .btn {
-      border-radius: 14px;
-      padding: 11px 15px;
-      min-height: 42px;
-      align-items: center;
-      justify-content: center;
-      transition: transform 0.18s ease, box-shadow 0.18s ease, filter 0.18s ease;
-      box-shadow: 0 6px 14px rgba(0, 43, 92, 0.08);
-    }
-
-    .btn:hover {
-      transform: translateY(-1px);
-      filter: brightness(0.99);
-      box-shadow: 0 10px 20px rgba(0, 43, 92, 0.14);
-    }
-
-    .btn:active {
-      transform: translateY(0);
-      box-shadow: 0 5px 12px rgba(0, 43, 92, 0.10);
-    }
-
-    .btn-primary {
-      background: linear-gradient(135deg, var(--azul), var(--azul-escuro));
-    }
-
-    .btn-success {
-      background: linear-gradient(135deg, var(--verde), var(--verde-escuro));
-    }
-
-    .btn-light {
-      background: #eef6ff;
-      border: 1px solid #d8e8fa;
-    }
-
-    .btn-danger {
-      background: linear-gradient(135deg, #ef4444, #b91c1c);
-    }
-
-    table {
-      border: 1px solid #edf1f7;
-      border-radius: 14px;
-      overflow: hidden;
-      background: white;
-    }
-
-    th {
-      background: linear-gradient(135deg, #eaf3ff, #f5fbff);
-      color: var(--azul-escuro);
-      letter-spacing: 0.03em;
-    }
-
-    td {
-      background: white;
-    }
-
-    tr:hover td {
-      background: #fbfdff;
-    }
-
-    .money {
-      color: var(--azul-escuro);
-      white-space: nowrap;
-    }
-
-    .status {
-      background: #eef6ff;
-      border: 1px solid #d9e9fb;
-      color: var(--azul-escuro);
-    }
-
-    .form-card {
-      position: sticky;
-      top: 86px;
-    }
-
-    .form-card hr {
-      margin: 18px 0 !important;
-    }
-
-    .preview-bar {
-      background: #f8fbff;
-      border: 1px solid #edf1f7;
-      border-radius: 18px;
-      padding: 12px;
-    }
-
-    .preview-bar h2 {
-      border: 0;
-      padding: 0;
-      margin: 0;
-      font-size: 19px;
-    }
-
-    #previewOrcamento {
-      box-shadow: inset 0 0 0 1px #edf1f7;
-      border-radius: 18px;
-    }
-
-    .item-card {
-      border-radius: 20px;
-      border-left-width: 6px;
-      box-shadow: 0 12px 26px rgba(0, 43, 92, 0.09);
-      transition: transform 0.18s ease, box-shadow 0.18s ease;
-    }
-
-    .item-card:hover {
-      transform: translateY(-1px);
-      box-shadow: 0 16px 32px rgba(0, 43, 92, 0.12);
-    }
-
-    .item-head {
-      align-items: center;
-    }
-
-    .item-title {
-      font-size: 15.5px;
-    }
-
-    .item-unit {
-      background: #eef6ff;
-      border: 1px solid #d9e9fb;
-    }
-
-    .item-field {
-      background: #fbfdff;
-      border-color: #e6eef8;
-    }
-
-    .item-field input {
-      background: white;
-      border-color: #d8e3f0;
-    }
-
-    .subtotal-box {
-      background: linear-gradient(135deg, #e8fff4, #f3fff8);
-      border-color: #bfeecd;
-    }
-
-    .btn-remove {
-      border-radius: 999px;
-      box-shadow: none;
-    }
-
-    .totals {
-      background: linear-gradient(135deg, #eaf3ff, #e8fff4);
-      border: 1px solid #d8e8fa;
-      box-shadow: 0 10px 24px rgba(0, 43, 92, 0.08);
-    }
-
-    .total-line.final {
-      letter-spacing: -0.02em;
-    }
-
-    .orc-head {
-      align-items: flex-start;
-    }
-
-    .logo-box {
-      box-shadow: 0 8px 18px rgba(0, 43, 92, 0.10);
-    }
-
-    .box {
-      box-shadow: 0 6px 16px rgba(0, 43, 92, 0.05);
-    }
-
-    .aprovacao-box {
-      background: linear-gradient(135deg, #e8fff4, #f5fff9);
-      box-shadow: 0 10px 22px rgba(0, 168, 89, 0.10);
-    }
-
-    .whatsapp-aprovar {
-      border-radius: 999px;
-      box-shadow: 0 10px 22px rgba(0, 168, 89, 0.22);
-    }
-
-    #clientes .card,
-    #produtos .card,
-    #empresa .card,
-    #lista .card {
-      min-height: 180px;
-    }
-
-    #empresa .card {
-      max-width: 980px;
-      margin: 0 auto;
-    }
-
-    #empresa .field p.muted {
-      margin: 7px 0 0;
-      padding: 9px 11px;
-      background: #f8fbff;
-      border: 1px solid #edf1f7;
-      border-radius: 12px;
-    }
-
-    .empty-box {
-      background: #fbfdff;
-      border-radius: 16px;
-    }
-
-    @media (max-width: 1000px) {
-      .form-card {
-        position: static;
-      }
-
-      .grid-2 {
-        gap: 18px;
-      }
-    }
-
-    @media (max-width: 700px) {
-      header {
-        padding: 18px 16px;
-      }
-
-      header h1 {
-        font-size: 20px;
-      }
-
-      .tabs {
-        padding: 10px;
-        gap: 7px;
-      }
-
-      .tabs button {
-        flex: 1 1 calc(50% - 8px);
-        padding: 10px 11px;
-        font-size: 13px;
-      }
-
-      .wrap {
-        padding: 12px;
-      }
-
-      .card {
-        border-radius: 18px;
-        padding: 16px;
-      }
-
-      .preview-bar .actions {
-        width: 100%;
-      }
-
-      .preview-bar .btn {
-        flex: 1 1 100%;
-      }
-
-      .actions .btn {
-        flex: 1 1 100%;
-      }
-    }
-  
-
-    /* =========================================================
-       AJUSTE FINO DOS BOTÕES - centralização e padrão visual
-       Não altera funções, IDs ou onclicks
-       ========================================================= */
-
-    .btn,
-    .tabs button {
-      display: inline-flex !important;
-      align-items: center !important;
-      justify-content: center !important;
-      text-align: center !important;
-      vertical-align: middle;
-      line-height: 1.15;
-      gap: 7px;
-      white-space: nowrap;
-    }
-
-    .btn {
-      min-height: 44px;
-      padding: 12px 18px;
-      border-radius: 15px;
-      font-size: 14px;
-      letter-spacing: 0.01em;
-    }
-
-    .tabs button {
-      min-height: 42px;
-      padding: 11px 17px;
-      font-size: 14px;
-      font-weight: 900;
-    }
-
-    .actions {
-      align-items: center;
-    }
-
-    .actions .btn {
-      min-width: 132px;
-    }
-
-    .preview-bar .actions .btn {
-      min-width: 118px;
-    }
-
-    .btn-success {
-      background: linear-gradient(135deg, #00b862, #008648);
-      color: #ffffff;
-    }
-
-    .btn-primary {
-      background: linear-gradient(135deg, #0066d6, #00418a);
-      color: #ffffff;
-    }
-
-    .btn-light {
-      background: linear-gradient(135deg, #f4f9ff, #e6f2ff);
-      color: var(--azul-escuro);
-      border: 1px solid #cfe2f7;
-    }
-
-    .btn-danger,
-    .btn-remove {
-      background: linear-gradient(135deg, #fff5f5, #ffe7e7);
-      color: #b91c1c;
-      border: 1px solid #fecaca;
-    }
-
-    .btn-danger:hover,
-    .btn-remove:hover {
-      background: linear-gradient(135deg, #ef4444, #b91c1c);
-      color: #ffffff;
-    }
-
-    .btn-remove {
-      min-width: 104px;
-      min-height: 38px;
-      padding: 9px 13px;
-      border-radius: 999px;
-      font-size: 13px;
-    }
-
-    .item-head .btn-remove {
-      align-self: flex-start;
-    }
-
-    .whatsapp-aprovar {
-      min-height: 42px;
-      padding: 12px 18px;
-      display: inline-flex !important;
-      align-items: center !important;
-      justify-content: center !important;
-      text-align: center !important;
-    }
-
-    button[style*="width:100%"],
-    button[style*="width: 100%"] {
-      width: 100% !important;
-    }
-
-    @media (max-width: 700px) {
-      .tabs button {
-        white-space: normal;
-        min-height: 46px;
-      }
-
-      .actions .btn,
-      .preview-bar .actions .btn,
-      .btn-remove {
-        width: 100%;
-        min-width: 0;
-      }
-
-      .btn,
-      .tabs button {
-        justify-content: center !important;
-        text-align: center !important;
-      }
-    }
-  
-
-    /* =========================================================
-       VISUAL PREMIUM VIATEC - refinamento final sem alterar JS
-       ========================================================= */
-
     :root {
       --azul: #0057b8;
       --azul-escuro: #003b7a;
@@ -541,7 +24,13 @@
       --sombra: 0 18px 45px rgba(0, 43, 92, 0.12);
     }
 
+    * {
+      box-sizing: border-box;
+    }
+
     body {
+      margin: 0;
+      font-family: Arial, Helvetica, sans-serif;
       color: var(--texto);
       background:
         linear-gradient(120deg, rgba(0, 87, 184, 0.10), transparent 32%),
@@ -551,7 +40,20 @@
 
     header {
       background:
-        linear-gradient(135deg, rgba(0, 59, 122, 0.98), rgba(0, 87, 184, 0.96) 48%, rgba(0, 168, 89, 0.95));
+        linear-gradient(
+          135deg,
+          rgba(0, 59, 122, 0.98),
+          rgba(0, 87, 184, 0.96) 48%,
+          rgba(0, 168, 89, 0.95)
+        );
+      color: #ffffff;
+      padding: 22px 28px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 14px;
+      flex-wrap: wrap;
+      box-shadow: 0 10px 28px rgba(0, 43, 92, 0.16);
       border-bottom: 1px solid rgba(255, 255, 255, 0.18);
       position: relative;
       overflow: hidden;
@@ -575,51 +77,114 @@
     }
 
     header h1 {
+      margin: 0;
       font-size: 25px;
       font-weight: 900;
+      letter-spacing: -0.02em;
+    }
+
+    header small {
+      display: block;
+      margin-top: 4px;
+      font-size: 13px;
+      opacity: 0.9;
     }
 
     #dataHoje {
-      background: rgba(255,255,255,0.16);
-      border: 1px solid rgba(255,255,255,0.22);
+      background: rgba(255, 255, 255, 0.16);
+      border: 1px solid rgba(255, 255, 255, 0.22);
       padding: 10px 14px;
       border-radius: 999px;
       backdrop-filter: blur(8px);
     }
 
     .tabs {
+      display: flex;
       justify-content: center;
+      gap: 10px;
+      flex-wrap: wrap;
+      padding: 12px 18px;
       background: rgba(245, 249, 255, 0.86);
+      position: sticky;
+      top: 0;
+      z-index: 10;
+      backdrop-filter: blur(8px);
       border-bottom: 1px solid rgba(0, 87, 184, 0.10);
+      box-shadow: 0 8px 22px rgba(0, 43, 92, 0.07);
+    }
+
+    .tabs button,
+    .btn {
+      border: 0;
+      cursor: pointer;
+      display: inline-flex !important;
+      align-items: center !important;
+      justify-content: center !important;
+      text-align: center !important;
+      vertical-align: middle;
+      line-height: 1.15;
+      gap: 7px;
+      white-space: nowrap;
+      font-family: Arial, Helvetica, sans-serif;
+      font-weight: 900;
+      transition: transform 0.18s ease, box-shadow 0.18s ease, filter 0.18s ease;
     }
 
     .tabs button {
-      background: rgba(255,255,255,0.9);
-      border: 1px solid #dbe8f7;
-      color: #24415f;
       min-width: 150px;
+      min-height: 42px;
+      padding: 11px 17px;
+      border-radius: 999px;
+      font-size: 14px;
+      background: rgba(255, 255, 255, 0.9);
+      color: #24415f;
+      border: 1px solid #dbe8f7;
+      box-shadow: 0 4px 12px rgba(0, 43, 92, 0.05);
+    }
+
+    .tabs button:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 8px 18px rgba(0, 43, 92, 0.12);
     }
 
     .tabs button.active {
       background: linear-gradient(135deg, var(--azul), var(--verde));
-      color: white;
+      color: #ffffff;
       border-color: transparent;
       box-shadow: 0 12px 25px rgba(0, 87, 184, 0.22);
     }
 
     .wrap {
+      padding: 22px;
       max-width: 1480px;
+      margin: 0 auto;
+    }
+
+    .section {
+      display: none;
+    }
+
+    .section.active {
+      display: block;
+    }
+
+    .grid {
+      display: grid;
+      gap: 16px;
     }
 
     .grid-2 {
       grid-template-columns: 430px minmax(0, 1fr);
       gap: 20px;
+      align-items: start;
     }
 
     .card {
-      background: rgba(255,255,255,0.94);
+      background: rgba(255, 255, 255, 0.94);
       backdrop-filter: blur(10px);
       border: 1px solid rgba(0, 87, 184, 0.09);
+      border-radius: 22px;
+      padding: 22px;
       box-shadow: 0 18px 45px rgba(0, 43, 92, 0.11);
     }
 
@@ -627,27 +192,47 @@
       display: flex;
       align-items: center;
       gap: 8px;
+      margin: 0 0 18px;
       color: #12345a;
+      font-size: 21px;
+      letter-spacing: -0.02em;
+      padding-bottom: 10px;
+      border-bottom: 1px solid #edf1f7;
     }
 
-    #orcamento .form-card h2::before { content: "🧾"; }
-    #clientes .card h2::before { content: "👤"; }
-    #produtos .card h2::before { content: "📦"; }
-    #lista .card h2::before { content: "📁"; }
-    #empresa .card h2::before { content: "⚙️"; }
-
-    .form-card {
-      background: linear-gradient(180deg, rgba(255,255,255,0.98), rgba(248,251,255,0.96));
-      border-top: 4px solid var(--azul);
+    .card h3 {
+      margin-top: 0;
+      margin-bottom: 12px;
+      color: var(--azul-escuro);
+      font-size: 17px;
     }
 
-    .field {
-      position: relative;
+    #orcamento .form-card h2::before {
+      content: "🧾";
+    }
+
+    #clientes .card h2::before {
+      content: "👤";
+    }
+
+    #produtos .card h2::before {
+      content: "📦";
+    }
+
+    #lista .card h2::before {
+      content: "📁";
+    }
+
+    #empresa .card h2::before {
+      content: "⚙️";
     }
 
     label {
+      display: block;
+      margin-bottom: 6px;
       color: #334155;
       font-size: 12.5px;
+      font-weight: 900;
       text-transform: uppercase;
       letter-spacing: 0.035em;
     }
@@ -655,10 +240,16 @@
     input,
     select,
     textarea {
+      width: 100%;
       min-height: 44px;
-      background: #ffffff;
       border: 1px solid #dbe7f4;
+      border-radius: 14px;
+      padding: 11px 12px;
+      font-size: 15px;
+      outline: none;
+      background: #ffffff;
       color: #172033;
+      transition: border-color 0.18s ease, box-shadow 0.18s ease, background 0.18s ease;
     }
 
     input::placeholder,
@@ -666,361 +257,157 @@
       color: #94a3b8;
     }
 
-    select {
-      cursor: pointer;
+    textarea {
+      min-height: 80px;
+      resize: vertical;
+      line-height: 1.45;
+    }
+
+    input:hover,
+    select:hover,
+    textarea:hover {
+      background: #ffffff;
+      border-color: #bdd2ea;
+    }
+
+    input:focus,
+    select:focus,
+    textarea:focus {
+      background: #ffffff;
+      border-color: var(--azul);
+      box-shadow: 0 0 0 4px rgba(0, 87, 184, 0.10);
+    }
+
+    .field {
+      margin-bottom: 14px;
+      position: relative;
+    }
+
+    .row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+
+    .actions {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-top: 14px;
+      background: transparent;
     }
 
     .btn {
-      border-radius: 999px;
-      font-weight: 900;
+      min-height: 40px;
+      min-width: 132px;
+      padding: 10px 15px;
+      border-radius: 13px;
+      font-size: 13.5px;
+      letter-spacing: 0.01em;
+      box-shadow: 0 7px 16px rgba(0, 43, 92, 0.09);
     }
 
-    .btn-primary,
-    .btn-success {
-      color: #fff;
-      border: 0;
+    .btn:hover {
+      transform: translateY(-1px);
+      filter: brightness(0.99);
+      box-shadow: 0 11px 22px rgba(0, 43, 92, 0.13);
+    }
+
+    .btn:active {
+      transform: translateY(0);
+      box-shadow: 0 5px 12px rgba(0, 43, 92, 0.10);
     }
 
     .btn-primary {
-      background: linear-gradient(135deg, #0069db, #003f87);
+      background: linear-gradient(135deg, #005fd0, #003b7a);
+      color: #ffffff;
     }
 
     .btn-success {
-      background: linear-gradient(135deg, #06bd68, #007a41);
+      background: linear-gradient(135deg, #00b965, #007a41);
+      color: #ffffff;
     }
 
     .btn-light {
       background: #ffffff;
-      border: 1px solid #dbe8f7;
-      color: var(--azul-escuro);
-    }
-
-    .btn-danger,
-    .btn-remove {
-      background: #fff5f5;
-      color: #b91c1c;
-      border: 1px solid #fecaca;
-    }
-
-    .actions {
-      background: transparent;
-    }
-
-    .preview-bar {
-      background: linear-gradient(135deg, #ffffff, #f7fbff);
-      border: 1px solid #dbe8f7;
-      box-shadow: 0 10px 24px rgba(0, 43, 92, 0.08);
-    }
-
-    #previewOrcamento {
-      background: #ffffff;
-      border: 1px solid #dbe8f7;
-      box-shadow: 0 14px 32px rgba(0, 43, 92, 0.10);
-    }
-
-    .orc-head {
-      border-bottom: 4px solid transparent;
-      border-image: linear-gradient(90deg, var(--azul), var(--verde)) 1;
-    }
-
-    .company h2 {
-      color: #12345a;
-      letter-spacing: -0.02em;
-    }
-
-    .orc-info h1 {
-      color: #12345a;
-      letter-spacing: -0.03em;
-    }
-
-    .box {
-      background: linear-gradient(180deg, rgba(255,255,255,0.98), rgba(249,252,255,0.96));
-      border: 1px solid #dfeaf6;
-      box-shadow: 0 8px 20px rgba(0, 43, 92, 0.06);
-    }
-
-    .box h3 {
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      color: #12345a;
-    }
-
-    .box h3::before {
-      content: "";
-      width: 8px;
-      height: 8px;
-      border-radius: 50%;
-      background: var(--verde);
-      display: inline-block;
-    }
-
-    .item-card {
-      background: linear-gradient(180deg, #ffffff, #fbfdff);
-      border-left: 6px solid var(--verde);
-      border-top: 1px solid #dbe8f7;
-      border-right: 1px solid #dbe8f7;
-      border-bottom: 1px solid #dbe8f7;
-    }
-
-    .item-title {
-      color: #12345a;
-    }
-
-    .item-unit {
-      background: #eef6ff;
+      border: 1px solid #d8e7f7;
       color: #003b7a;
     }
 
-    .item-field {
-      background: #f8fbff;
-      border: 1px solid #e1ebf6;
-    }
-
-    .item-field label {
-      color: #64748b;
-    }
-
-    .subtotal-box {
-      background: linear-gradient(135deg, #e9fff4, #f7fffa);
-      color: #006b3a;
-    }
-
-    .totals {
-      border: 1px solid #caead8;
-      background: linear-gradient(135deg, #f1f8ff, #eafff4);
-    }
-
-    .total-line.final {
-      color: #003b7a;
-    }
-
-    .aprovacao-box {
-      border: 1px solid #bceccc;
-      background: linear-gradient(135deg, #e9fff4, #f8fffb);
-    }
-
-    .aprovacao-box h3 {
-      color: #006b3a;
-    }
-
-    .whatsapp-aprovar {
-      background: linear-gradient(135deg, #08bd68, #007a41);
-      color: white;
-      box-shadow: 0 12px 24px rgba(0, 168, 89, 0.24);
+    .btn-danger {
+      background: linear-gradient(135deg, #ef4444, #b91c1c);
+      color: #ffffff;
     }
 
     table {
-      border-color: #dfeaf6;
+      width: 100%;
+      border-collapse: collapse;
+      border: 1px solid #dfeaf6;
+      border-radius: 14px;
+      overflow: hidden;
+      background: #ffffff;
+      box-shadow: 0 10px 24px rgba(0, 43, 92, 0.05);
+    }
+
+    th,
+    td {
+      padding: 10px;
+      border-bottom: 1px solid #edf1f7;
+      text-align: left;
+      font-size: 14px;
+      vertical-align: top;
     }
 
     th {
       background: #eff7ff;
       color: #12345a;
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.03em;
     }
 
     tr:nth-child(even) td {
       background: #fbfdff;
     }
 
-    #listaClientes table,
-    #listaProdutos table,
-    #listaOrcamentos table {
-      box-shadow: 0 10px 24px rgba(0, 43, 92, 0.05);
+    tr:hover td {
+      background: #fbfdff;
     }
 
-    #empresa .card {
-      border-top: 4px solid var(--verde);
-    }
-
-    #empresa input[type="file"] {
-      padding: 12px;
-      background: #f8fbff;
-    }
-
-    .empty-box {
-      background: linear-gradient(135deg, #ffffff, #f8fbff);
-      color: #64748b;
-    }
-
-    @media (max-width: 700px) {
-      .tabs {
-        justify-content: stretch;
-      }
-
-      .tabs button {
-        min-width: 0;
-      }
-
-      .card h2 {
-        font-size: 19px;
-      }
-    }
-  
-
-    /* =========================================================
-       ITENS DO ORÇAMENTO - visual mais limpo ao preencher
-       Mantém as mesmas funções: alterarQtd, alterarValor e removerItem
-       ========================================================= */
-
-    .item-clean-card {
-      background: #ffffff;
-      border: 1px solid #dce8f5;
-      border-radius: 18px;
-      padding: 14px;
-      margin-bottom: 12px;
-      box-shadow: 0 10px 24px rgba(0, 43, 92, 0.07);
-      overflow: hidden;
-    }
-
-    .item-clean-top {
-      display: grid;
-      grid-template-columns: 34px minmax(0, 1fr) auto;
-      gap: 10px;
-      align-items: center;
-      padding-bottom: 12px;
-      margin-bottom: 12px;
-      border-bottom: 1px solid #edf3fa;
-    }
-
-    .item-clean-index {
-      width: 34px;
-      height: 34px;
-      border-radius: 12px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      background: linear-gradient(135deg, var(--azul), var(--verde));
-      color: #ffffff;
+    .money {
+      color: var(--azul-escuro);
       font-weight: 900;
-      font-size: 14px;
-      flex: 0 0 auto;
+      white-space: nowrap;
     }
 
-    .item-clean-main {
-      min-width: 0;
-    }
-
-    .item-clean-title {
-      color: #12345a;
-      font-size: 15px;
-      font-weight: 900;
-      line-height: 1.25;
-      word-break: break-word;
-    }
-
-    .item-clean-sub {
-      margin-top: 3px;
+    .muted {
       color: var(--muted);
-      font-size: 12.5px;
+      font-size: 13px;
     }
 
-    .item-clean-remove {
-      min-width: 88px !important;
-      min-height: 36px;
-      padding: 8px 12px;
+    .status {
+      display: inline-block;
+      padding: 5px 9px;
       border-radius: 999px;
-      background: #fff5f5;
-      border: 1px solid #fecaca;
-      color: #b91c1c;
-      box-shadow: none;
-      font-size: 12.5px;
-      white-space: nowrap;
-    }
-
-    .item-clean-remove:hover {
-      color: #ffffff;
-      background: linear-gradient(135deg, #ef4444, #b91c1c);
-    }
-
-    .item-clean-grid {
-      display: grid;
-      grid-template-columns: 82px minmax(0, 1fr) minmax(0, 1fr);
-      gap: 9px;
-      align-items: stretch;
-    }
-
-    .item-clean-field {
-      min-width: 0;
-      background: #f8fbff;
-      border: 1px solid #e4edf7;
-      border-radius: 14px;
-      padding: 9px;
-    }
-
-    .item-clean-field label {
-      display: block;
-      margin-bottom: 6px;
-      color: #64748b;
-      font-size: 10.5px;
+      background: #eef6ff;
+      border: 1px solid #d9e9fb;
+      color: var(--azul-escuro);
       font-weight: 900;
-      text-transform: uppercase;
-      letter-spacing: 0.035em;
-      white-space: nowrap;
+      font-size: 12px;
     }
 
-    .item-clean-field input {
-      width: 100%;
-      min-width: 0;
-      height: 40px;
-      padding: 7px 8px;
-      border-radius: 12px;
-      font-size: 14.5px;
-      font-weight: 900;
-      background: #ffffff;
+    .form-card {
+      position: sticky;
+      top: 86px;
+      background: linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(248, 251, 255, 0.96));
+      border-top: 4px solid var(--azul);
     }
-
-    .item-clean-qtd input {
-      text-align: center;
-      font-size: 18px;
-      padding-left: 4px;
-      padding-right: 4px;
-    }
-
-    .item-clean-subtotal {
-      height: 40px;
-      min-width: 0;
-      padding: 7px 8px;
-      border-radius: 12px;
-      display: flex;
-      align-items: center;
-      justify-content: flex-end;
-      background: linear-gradient(135deg, #e8fff4, #f7fffb);
-      border: 1px solid #c6efd6;
-      color: #006b3a;
-      font-size: 14.5px;
-      font-weight: 900;
-      white-space: nowrap;
-      overflow: hidden;
-    }
-
-    @media (max-width: 700px) {
-      .item-clean-top {
-        grid-template-columns: 34px minmax(0, 1fr);
-      }
-
-      .item-clean-remove {
-        grid-column: 1 / -1;
-        width: 100%;
-      }
-
-      .item-clean-grid {
-        grid-template-columns: 1fr;
-      }
-
-      .item-clean-field input,
-      .item-clean-subtotal {
-        font-size: 16px;
-      }
-    }
-  
-
-    /* =========================================================
-       FORMULÁRIO DE PREENCHIMENTO - visual moderno
-       Somente HTML/CSS. Mantém todos os onclicks e funções.
-       ========================================================= */
 
     .form-section-box {
+      position: relative;
+      z-index: 1;
+      overflow: visible !important;
       background: rgba(255, 255, 255, 0.82);
       border: 1px solid #e0ebf7;
       border-radius: 20px;
@@ -1031,829 +418,26 @@
 
     .form-section-title {
       display: flex;
-      align-items: center;
-      gap: 9px;
-      color: #12345a;
-      font-weight: 900;
-      font-size: 15px;
-      margin-bottom: 14px;
-    }
-
-    .form-section-title span {
-      width: 26px;
-      height: 26px;
-      border-radius: 10px;
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      background: linear-gradient(135deg, var(--azul), var(--verde));
-      color: white;
-      font-size: 13px;
-      box-shadow: 0 8px 16px rgba(0, 87, 184, 0.18);
-    }
-
-    .field-modern {
-      background: #f8fbff;
-      border: 1px solid #edf3fa;
-      border-radius: 16px;
-      padding: 9px;
-      margin-bottom: 12px;
-    }
-
-    .field-modern label {
-      margin-bottom: 7px;
-      color: #48627f;
-      font-size: 11px;
-      font-weight: 900;
-      letter-spacing: 0.045em;
-    }
-
-    .field-modern input,
-    .field-modern select,
-    .field-modern textarea {
-      background: #ffffff;
-      border-radius: 13px;
-      border-color: #d9e5f2;
-      min-height: 43px;
-    }
-
-    .field-modern textarea {
-      min-height: 92px;
-    }
-
-    .add-item-panel {
-      background: linear-gradient(135deg, rgba(238,246,255,0.92), rgba(234,255,244,0.92));
-      border-color: #cfe6f8;
-    }
-
-    .add-item-row {
-      display: grid;
-      grid-template-columns: 90px 132px;
-      gap: 10px;
-      align-items: end;
-    }
-
-    .qtd-field {
-      margin-bottom: 0;
-      padding: 8px;
-    }
-
-    .qtd-field input {
-      text-align: center;
-      font-size: 18px;
-      font-weight: 900;
-    }
-
-    .add-product-btn {
-      min-height: 44px;
-      height: 44px;
-      align-self: end;
-      border-radius: 14px;
-      font-size: 14px;
-      padding: 9px 14px;
-      width: 132px;
-      min-width: 132px;
-      box-shadow: 0 8px 18px rgba(0, 168, 89, 0.16);
-      gap: 8px;
-    }
-
-    .add-plus {
-      width: 22px;
-      height: 22px;
-      border-radius: 8px;
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      background: rgba(255,255,255,.22);
-      color: white;
-      font-size: 20px;
-      font-weight: 900;
-      line-height: 1;
-    }
-
-    .manual-btn {
-      width: auto;
-      margin-top: 10px;
-      border-style: dashed;
-      min-width: 190px;
-    }
-
-    .form-final-actions {
-      background: #ffffff;
-      border: 1px solid #e0ebf7;
-      border-radius: 18px;
-      padding: 12px;
-      box-shadow: 0 10px 24px rgba(0, 43, 92, 0.07);
-      position: sticky;
-      bottom: 12px;
-      z-index: 5;
-    }
-
-    .form-final-actions .btn {
-      flex: 1;
-    }
-
-    .form-card > h2 {
-      margin-bottom: 18px;
-    }
-
-    @media (max-width: 700px) {
-      .form-section-box {
-        padding: 12px;
-        border-radius: 18px;
-      }
-
-      .add-item-row {
-        grid-template-columns: 1fr;
-      }
-
-      .add-product-btn {
-        min-height: 44px;
-        height: 44px;
-        width: 100%;
-        min-width: 0;
-      }
-
-      .manual-btn {
-        width: 100%;
-      }
-
-      .form-final-actions {
-        position: static;
-      }
-    }
-  
-
-    /* =========================================================
-       SELETOR DE CLIENTE MODERNO
-       Mantém o select original escondido para preservar a lógica
-       ========================================================= */
-
-    .cliente-picker-wrap {
-      position: relative;
-      overflow: visible;
-      z-index: 20;
-    }
-
-    .select-real-escondido {
-      position: absolute;
-      opacity: 0;
-      pointer-events: none;
-      height: 0;
-      min-height: 0;
-      padding: 0;
-      border: 0;
-    }
-
-    .cliente-picker-btn {
-      width: 100%;
-      min-height: 48px;
-      border: 1px solid #d9e5f2;
-      border-radius: 14px;
-      background: #ffffff;
-      color: #172033;
-      padding: 12px 14px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 12px;
-      font-size: 15px;
-      font-weight: 800;
-      cursor: pointer;
-      box-shadow: inset 0 0 0 1px rgba(255,255,255,.7);
-      transition: border-color .18s ease, box-shadow .18s ease, transform .18s ease;
-    }
-
-    .cliente-picker-btn:hover,
-    .cliente-picker-btn:focus {
-      border-color: var(--azul);
-      box-shadow: 0 0 0 4px rgba(0,87,184,.10);
-      outline: none;
-    }
-
-    .cliente-picker-seta {
-      width: 28px;
-      height: 28px;
-      border-radius: 10px;
-      background: linear-gradient(135deg, #eef6ff, #e8fff4);
-      color: var(--azul-escuro);
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      flex: 0 0 auto;
-      font-size: 18px;
-      line-height: 1;
-    }
-
-    .cliente-picker-lista {
-      display: none;
-      position: absolute;
-      left: 10px;
-      right: 10px;
-      top: calc(100% - 4px);
-      z-index: 999;
-      background: #ffffff;
-      border: 1px solid #dbe8f7;
-      border-radius: 16px;
-      box-shadow: 0 20px 40px rgba(0,43,92,.18);
-      padding: 8px;
-      max-height: 260px;
-      overflow: auto;
-    }
-
-    .cliente-picker-lista.open {
-      display: grid;
-      gap: 6px;
-    }
-
-    .cliente-picker-opcao {
-      border: 0;
-      width: 100%;
-      text-align: left;
-      background: #ffffff;
-      border-radius: 13px;
-      padding: 11px 12px;
-      cursor: pointer;
-      display: grid;
-      gap: 3px;
-      color: #172033;
-      transition: background .18s ease, transform .18s ease;
-    }
-
-    .cliente-picker-opcao:hover {
-      background: linear-gradient(135deg, #eef6ff, #eafff4);
-      transform: translateX(2px);
-    }
-
-    .cliente-picker-opcao strong {
-      color: #12345a;
-      font-size: 14px;
-    }
-
-    .cliente-picker-opcao span,
-    .cliente-picker-vazio {
-      color: var(--muted);
-      font-size: 12px;
-    }
-
-    .cliente-picker-vazio {
-      padding: 12px;
-      text-align: center;
-    }
-  
-
-    /* =========================================================
-       SELETOR DE PRODUTO/SERVIÇO MODERNO
-       Mantém o select original escondido para preservar a lógica
-       ========================================================= */
-
-    .produto-picker-wrap {
-      position: relative;
-      overflow: visible;
-      z-index: 18;
-    }
-
-    .produto-picker-btn {
-      width: 100%;
-      min-height: 48px;
-      border: 1px solid #d9e5f2;
-      border-radius: 14px;
-      background: #ffffff;
-      color: #172033;
-      padding: 12px 14px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 12px;
-      font-size: 15px;
-      font-weight: 800;
-      cursor: pointer;
-      box-shadow: inset 0 0 0 1px rgba(255,255,255,.7);
-      transition: border-color .18s ease, box-shadow .18s ease, transform .18s ease;
-    }
-
-    .produto-picker-btn:hover,
-    .produto-picker-btn:focus {
-      border-color: var(--verde);
-      box-shadow: 0 0 0 4px rgba(0,168,89,.10);
-      outline: none;
-    }
-
-    #produtoPickerTexto {
-      overflow: hidden;
-      text-overflow: ellipsis;
-      white-space: nowrap;
-      text-align: left;
-    }
-
-    .produto-picker-seta {
-      width: 28px;
-      height: 28px;
-      border-radius: 10px;
-      background: linear-gradient(135deg, #eef6ff, #e8fff4);
-      color: var(--verde-escuro);
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      flex: 0 0 auto;
-      font-size: 18px;
-      line-height: 1;
-    }
-
-    .produto-picker-lista {
-      display: none;
-      position: absolute;
-      left: 10px;
-      right: 10px;
-      top: calc(100% - 4px);
-      z-index: 998;
-      background: #ffffff;
-      border: 1px solid #dbe8f7;
-      border-radius: 16px;
-      box-shadow: 0 20px 40px rgba(0,43,92,.18);
-      padding: 8px;
-      max-height: 280px;
-      overflow: auto;
-    }
-
-    .produto-picker-lista.open {
-      display: grid;
-      gap: 6px;
-    }
-
-    .produto-picker-opcao {
-      border: 0;
-      width: 100%;
-      text-align: left;
-      background: #ffffff;
-      border-radius: 13px;
-      padding: 11px 12px;
-      cursor: pointer;
-      display: grid;
-      gap: 4px;
-      color: #172033;
-      transition: background .18s ease, transform .18s ease;
-    }
-
-    .produto-picker-opcao:hover {
-      background: linear-gradient(135deg, #eef6ff, #eafff4);
-      transform: translateX(2px);
-    }
-
-    .produto-picker-opcao strong {
-      color: #12345a;
-      font-size: 14px;
-      line-height: 1.25;
-    }
-
-    .produto-picker-opcao span,
-    .produto-picker-vazio {
-      color: var(--muted);
-      font-size: 12px;
-    }
-
-    .produto-picker-vazio {
-      padding: 12px;
-      text-align: center;
-    }
-  
-
-    /* =========================================================
-       ADICIONAR PRODUTO - seletor + quantidade + botão pequeno
-       Mantém produtoSelecionado, itemQtd e adicionarProduto()
-       ========================================================= */
-
-    .produto-add-compact {
-      display: grid;
-      grid-template-columns: minmax(0, 1fr) 72px 46px;
-      gap: 10px;
-      align-items: end;
-    }
-
-    .produto-picker-compact {
-      background: #f8fbff;
-      border: 1px solid #edf3fa;
-      border-radius: 16px;
-      padding: 9px;
-      min-width: 0;
-    }
-
-    .produto-picker-compact label,
-    .qtd-compact label {
-      display: block;
-      margin-bottom: 7px;
-      color: #48627f;
-      font-size: 11px;
-      font-weight: 900;
-      text-transform: uppercase;
-      letter-spacing: 0.045em;
-    }
-
-    .produto-picker-compact .produto-picker-btn {
-      min-height: 44px;
-      height: 44px;
-      border-radius: 13px;
-      padding: 10px 12px;
-    }
-
-    .qtd-compact {
-      background: #f8fbff;
-      border: 1px solid #edf3fa;
-      border-radius: 16px;
-      padding: 9px;
-      min-width: 0;
-    }
-
-    .qtd-compact input {
-      width: 100%;
-      min-width: 0;
-      height: 44px;
-      border-radius: 13px;
-      text-align: center;
-      font-size: 18px;
-      font-weight: 900;
-      padding: 8px 4px;
-      background: #ffffff;
-    }
-
-    .add-product-icon {
-      width: 46px !important;
-      min-width: 46px !important;
-      height: 46px !important;
-      min-height: 46px !important;
-      padding: 0 !important;
-      border-radius: 16px;
-      align-self: end;
-      box-shadow: 0 10px 22px rgba(0, 168, 89, 0.22);
-    }
-
-    .add-product-icon .add-plus {
-      width: 26px;
-      height: 26px;
-      border-radius: 10px;
-      font-size: 24px;
-      background: rgba(255,255,255,.24);
-    }
-
-    @media (max-width: 700px) {
-      .produto-add-compact {
-        grid-template-columns: minmax(0, 1fr) 70px 46px;
-      }
-    }
-
-    @media (max-width: 460px) {
-      .produto-add-compact {
-        grid-template-columns: 1fr 70px;
-      }
-
-      .produto-picker-compact {
-        grid-column: 1 / -1;
-      }
-
-      .add-product-icon {
-        width: 100% !important;
-        min-width: 0 !important;
-      }
-    }
-  
-
-    /* =========================================================
-       CORREÇÃO DO ADICIONAR PRODUTO
-       Produto com seta + quantidade com controle + botão pequeno
-       ========================================================= */
-
-    .produto-add-line {
-      display: grid;
-      grid-template-columns: minmax(0, 1fr) 112px 48px;
-      gap: 10px;
-      align-items: end;
-    }
-
-    .produto-picker-line {
-      position: relative;
-      min-width: 0;
-      background: transparent !important;
-      border: 0 !important;
-      padding: 0 !important;
-    }
-
-    .produto-picker-line label,
-    .qtd-stepper label {
-      display: block;
-      margin-bottom: 6px;
-      color: #48627f;
-      font-size: 11px;
-      font-weight: 900;
-      text-transform: uppercase;
-      letter-spacing: .045em;
-    }
-
-    .produto-picker-line .produto-picker-btn {
-      height: 46px;
-      min-height: 46px;
-      border-radius: 14px;
-      background: #ffffff;
-      border: 1px solid #d9e5f2;
-      box-shadow: none;
-    }
-
-    .produto-picker-line .produto-picker-seta {
-      background: #eef6ff;
-      color: var(--azul-escuro);
-      font-size: 20px;
-    }
-
-    .qtd-stepper {
-      min-width: 0;
-    }
-
-    .qtd-stepper-box {
-      height: 46px;
-      display: grid;
-      grid-template-columns: 30px minmax(0, 1fr) 30px;
-      border: 1px solid #d9e5f2;
-      border-radius: 14px;
-      overflow: hidden;
-      background: #ffffff;
-    }
-
-    .qtd-stepper-box button {
-      border: 0;
-      background: #eef6ff;
-      color: var(--azul-escuro);
-      font-size: 18px;
-      font-weight: 900;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-
-    .qtd-stepper-box button:hover {
-      background: #dcecff;
-    }
-
-    .qtd-stepper-box input {
-      border: 0;
-      border-left: 1px solid #d9e5f2;
-      border-right: 1px solid #d9e5f2;
-      border-radius: 0;
-      text-align: center;
-      font-size: 17px;
-      font-weight: 900;
-      min-height: 44px;
-      padding: 0 4px;
-      background: #ffffff;
-      box-shadow: none !important;
-    }
-
-    .add-product-round {
-      width: 48px !important;
-      min-width: 48px !important;
-      height: 46px !important;
-      min-height: 46px !important;
-      padding: 0 !important;
-      border-radius: 14px;
-      font-size: 28px;
-      line-height: 1;
-      font-weight: 900;
-      box-shadow: 0 8px 18px rgba(0,168,89,.20);
-    }
-
-    @media (max-width: 700px) {
-      .produto-add-line {
-        grid-template-columns: minmax(0, 1fr) 104px 48px;
-      }
-    }
-
-    @media (max-width: 480px) {
-      .produto-add-line {
-        grid-template-columns: 1fr 104px 48px;
-      }
-
-      #produtoPickerTexto {
-        max-width: 170px;
-      }
-    }
-  
-
-    /* =========================================================
-       PRODUTOS: botão + e quantidade DENTRO da lista
-       Fora fica apenas o campo para abrir a lista
-       ========================================================= */
-
-    .produto-add-list-only {
-      display: block;
-      width: 100%;
-    }
-
-    .produto-add-list-only .produto-picker-line {
-      width: 100%;
-    }
-
-    .produto-add-list-only .produto-picker-lista {
-      max-height: 360px;
-      padding: 10px;
-    }
-
-    .produto-opcao-add {
-      display: grid !important;
-      grid-template-columns: minmax(0, 1fr) auto;
-      gap: 10px;
-      align-items: center;
-      padding: 10px !important;
-      border: 1px solid #edf3fa;
-      background: #ffffff;
-    }
-
-    .produto-opcao-info {
-      border: 0;
-      background: transparent;
-      padding: 0;
-      text-align: left;
-      cursor: pointer;
-      display: grid;
-      gap: 4px;
-      min-width: 0;
-    }
-
-    .produto-opcao-info strong {
-      color: #12345a;
-      font-size: 14px;
-      line-height: 1.25;
-    }
-
-    .produto-opcao-info span {
-      color: var(--muted);
-      font-size: 12px;
-    }
-
-    .produto-opcao-acoes {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      flex: 0 0 auto;
-    }
-
-    .produto-opcao-qtd {
-      width: 94px;
-      height: 36px;
-      display: grid;
-      grid-template-columns: 26px minmax(0, 1fr) 26px;
-      border: 1px solid #d9e5f2;
-      border-radius: 12px;
-      overflow: hidden;
-      background: #ffffff;
-    }
-
-    .produto-opcao-qtd button {
-      border: 0;
-      background: #eef6ff;
-      color: var(--azul-escuro);
-      font-weight: 900;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 15px;
-    }
-
-    .produto-opcao-qtd input {
-      border: 0;
-      border-left: 1px solid #d9e5f2;
-      border-right: 1px solid #d9e5f2;
-      border-radius: 0;
-      text-align: center;
-      font-weight: 900;
-      font-size: 14px;
-      min-height: 34px;
-      height: 34px;
-      padding: 0 2px;
-      background: #ffffff;
-      box-shadow: none !important;
-    }
-
-    .produto-opcao-add-btn {
-      width: 36px;
-      height: 36px;
-      border: 0;
-      border-radius: 12px;
-      background: linear-gradient(135deg, var(--verde), var(--verde-escuro));
-      color: white;
-      font-size: 22px;
-      font-weight: 900;
-      line-height: 1;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      box-shadow: 0 8px 16px rgba(0,168,89,.20);
-    }
-
-    .produto-opcao-add-btn:hover {
-      filter: brightness(.97);
-      transform: translateY(-1px);
-    }
-
-    @media (max-width: 560px) {
-      .produto-opcao-add {
-        grid-template-columns: 1fr;
-      }
-
-      .produto-opcao-acoes {
-        justify-content: space-between;
-      }
-
-      .produto-opcao-qtd {
-        width: 120px;
-      }
-    }
-  
-
-    /* =========================================================
-       AJUSTE FINO - botões menores dentro da lista de produtos
-       Não altera funções, apenas tamanho/visual
-       ========================================================= */
-
-    .produto-opcao-add {
-      padding: 8px 9px !important;
-      gap: 8px;
-    }
-
-    .produto-opcao-info strong {
-      font-size: 13.5px;
-    }
-
-    .produto-opcao-info span {
-      font-size: 11.5px;
-    }
-
-    .produto-opcao-acoes {
-      gap: 6px;
-    }
-
-    .produto-opcao-qtd {
-      width: 78px;
-      height: 30px;
-      grid-template-columns: 22px minmax(0, 1fr) 22px;
-      border-radius: 10px;
-    }
-
-    .produto-opcao-qtd button {
-      font-size: 13px;
-      padding: 0;
-      min-width: 0;
-      min-height: 0;
-      line-height: 1;
-    }
-
-    .produto-opcao-qtd input {
-      height: 28px;
-      min-height: 28px;
-      font-size: 12.5px;
-      padding: 0 1px;
-    }
-
-    .produto-opcao-add-btn {
-      width: 30px;
-      height: 30px;
-      border-radius: 10px;
-      font-size: 19px;
-      box-shadow: 0 5px 12px rgba(0,168,89,.18);
-    }
-
-    @media (max-width: 560px) {
-      .produto-opcao-qtd {
-        width: 94px;
-      }
-
-      .produto-opcao-add-btn {
-        width: 34px;
-        height: 34px;
-      }
-    }
-  
-
-    /* =========================================================
-       REFINO DAS ETAPAS E BOTÕES
-       Somente CSS/HTML visual, sem alterar funções
-       ========================================================= */
-
-    .form-section-title {
       align-items: flex-start;
       gap: 11px;
+      color: #12345a;
+      font-weight: 900;
+      font-size: 15px;
       margin-bottom: 15px;
     }
 
-    .form-section-title span {
-      width: 34px;
-      height: 34px;
-      border-radius: 13px;
-      font-size: 12px;
-      letter-spacing: 0.02em;
+    .form-section-title .section-icon {
+      width: 32px;
+      height: 32px;
+      border-radius: 12px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
       flex: 0 0 auto;
-      background: linear-gradient(135deg, #0057b8, #00a859);
-      box-shadow: 0 10px 20px rgba(0, 87, 184, 0.18);
+      font-size: 15px;
+      background: linear-gradient(135deg, #eef6ff, #eafff4);
+      border: 1px solid #dceafa;
+      color: var(--azul-escuro);
     }
 
     .form-section-title div {
@@ -1878,48 +462,49 @@
       letter-spacing: 0;
     }
 
-    .btn,
-    .tabs button,
-    .cliente-picker-btn,
-    .produto-picker-btn,
-    .produto-opcao-add-btn,
-    .produto-opcao-qtd button,
-    .item-clean-remove,
-    .btn-remove {
-      font-family: Arial, Helvetica, sans-serif;
+    .field-modern {
+      background: #f8fbff;
+      border: 1px solid #edf3fa;
+      border-radius: 16px;
+      padding: 9px;
+      margin-bottom: 12px;
+      overflow: visible !important;
     }
 
-    .btn {
-      border-radius: 13px;
-      min-height: 40px;
-      padding: 10px 15px;
-      font-size: 13.5px;
-      box-shadow: 0 7px 16px rgba(0, 43, 92, 0.09);
+    .field-modern label {
+      margin-bottom: 7px;
+      color: #48627f;
+      font-size: 11px;
+      font-weight: 900;
+      letter-spacing: 0.045em;
     }
 
-    .btn:hover {
-      transform: translateY(-1px);
-      box-shadow: 0 11px 22px rgba(0, 43, 92, 0.13);
-    }
-
-    .btn-primary {
-      background: linear-gradient(135deg, #005fd0, #003b7a);
-    }
-
-    .btn-success {
-      background: linear-gradient(135deg, #00b965, #007a41);
-    }
-
-    .btn-light {
+    .field-modern input,
+    .field-modern select,
+    .field-modern textarea {
       background: #ffffff;
-      border: 1px solid #d8e7f7;
-      color: #003b7a;
+      border-radius: 13px;
+      border-color: #d9e5f2;
+      min-height: 43px;
+    }
+
+    .field-modern textarea {
+      min-height: 92px;
+    }
+
+    .add-item-panel {
+      background: linear-gradient(135deg, rgba(238, 246, 255, 0.92), rgba(234, 255, 244, 0.92));
+      border-color: #cfe6f8;
     }
 
     .manual-btn {
+      width: auto;
+      min-width: 190px;
       min-height: 38px;
+      margin-top: 10px;
       padding: 9px 13px;
       border-radius: 13px;
+      border-style: dashed;
       font-size: 13px;
       color: #335b83;
       background: #f8fbff;
@@ -1933,267 +518,464 @@
     }
 
     .form-final-actions {
-      gap: 9px;
-      padding: 10px;
+      background: #ffffff;
+      border: 1px solid #e0ebf7;
       border-radius: 16px;
+      padding: 10px;
+      gap: 9px;
+      box-shadow: 0 10px 24px rgba(0, 43, 92, 0.07);
+      position: sticky;
+      bottom: 12px;
+      z-index: 5;
     }
 
     .form-final-actions .btn {
+      flex: 1;
       min-height: 42px;
       font-size: 14px;
     }
 
-    .produto-picker-btn,
-    .cliente-picker-btn {
-      min-height: 44px;
-      height: 44px;
-      border-radius: 13px;
-      font-size: 14px;
-      box-shadow: 0 4px 10px rgba(0, 43, 92, 0.04);
+    .preview-bar {
+      display: flex;
+      gap: 8px;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      margin-bottom: 12px;
+      background: linear-gradient(135deg, #ffffff, #f7fbff);
+      border: 1px solid #dbe8f7;
+      border-radius: 18px;
+      padding: 12px;
+      box-shadow: 0 10px 24px rgba(0, 43, 92, 0.08);
     }
 
-    .produto-picker-seta,
-    .cliente-picker-seta {
-      width: 26px;
-      height: 26px;
-      border-radius: 9px;
-      font-size: 17px;
-    }
-
-    .produto-opcao-add {
-      border-radius: 14px;
-      padding: 8px !important;
-      background: #ffffff;
-    }
-
-    .produto-opcao-info {
-      border-radius: 11px;
-      padding: 4px 5px;
-    }
-
-    .produto-opcao-info:hover {
-      background: #f6fbff;
-    }
-
-    .produto-opcao-qtd {
-      width: 76px;
-      height: 29px;
-      border-radius: 10px;
-    }
-
-    .produto-opcao-qtd button {
-      font-size: 13px;
-      min-height: 0;
+    .preview-bar h2 {
+      border: 0;
       padding: 0;
+      margin: 0;
+      font-size: 19px;
     }
 
-    .produto-opcao-qtd input {
-      height: 27px;
-      min-height: 27px;
+    .preview-bar .actions .btn {
+      min-width: 118px;
+    }
+
+    #previewOrcamento {
+      background: #ffffff;
+      min-height: 900px;
+      border-radius: 18px;
+      padding: 30px;
+      border: 1px solid #dbe8f7;
+      box-shadow: 0 14px 32px rgba(0, 43, 92, 0.10);
+      position: relative;
+      overflow: hidden;
+    }
+        #previewOrcamento.com-timbrado {
+      background-size: cover;
+      background-position: center top;
+      background-repeat: no-repeat;
+    }
+
+    #previewOrcamento.com-timbrado::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: rgba(255, 255, 255, 0.10);
+      pointer-events: none;
+    }
+
+    #previewOrcamento > * {
+      position: relative;
+      z-index: 1;
+    }
+
+    .orc-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 18px;
+      border-bottom: 4px solid transparent;
+      border-image: linear-gradient(90deg, var(--azul), var(--verde)) 1;
+      padding-bottom: 16px;
+      margin-bottom: 18px;
+    }
+
+    .company {
+      display: flex;
+      gap: 12px;
+    }
+
+    .logo-box {
+      width: 72px;
+      height: 72px;
+      border-radius: 14px;
+      background: linear-gradient(135deg, var(--azul), var(--verde));
+      color: #ffffff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 24px;
+      font-weight: 900;
+      flex: 0 0 auto;
+      overflow: hidden;
+      border: 1px solid #e5e7eb;
+      box-shadow: 0 8px 18px rgba(0, 43, 92, 0.10);
+    }
+
+    .logo-box img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      background: #ffffff;
+      padding: 4px;
+    }
+
+    .company h2 {
+      margin: 0;
+      color: #12345a;
+      font-size: 20px;
+      letter-spacing: -0.02em;
+    }
+
+    .company p,
+    .orc-info p {
+      margin: 3px 0;
       font-size: 12px;
+      color: #4b5563;
     }
 
-    .produto-opcao-add-btn {
-      width: 29px;
-      height: 29px;
-      border-radius: 10px;
-      font-size: 18px;
-      box-shadow: 0 6px 13px rgba(0, 168, 89, 0.18);
+    .orc-info {
+      text-align: right;
     }
 
-    .item-clean-remove,
-    .btn-remove {
-      min-height: 34px;
-      min-width: 84px !important;
-      padding: 7px 11px;
-      font-size: 12px;
-      border-radius: 999px;
-      box-shadow: none;
+    .orc-info h1 {
+      margin: 0 0 8px;
+      color: #12345a;
+      letter-spacing: -0.03em;
+    }
+
+    .box-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+
+    .box {
+      border: 1px solid #dfeaf6;
+      border-radius: 13px;
+      padding: 12px;
+      background: linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(249, 252, 255, 0.96));
+      box-shadow: 0 8px 20px rgba(0, 43, 92, 0.06);
+    }
+
+    .box h3 {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      margin: 0 0 8px;
+      color: #12345a;
+      font-size: 15px;
+    }
+
+    .box h3::before {
+      content: "";
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--verde);
+      display: inline-block;
+    }
+
+    .box p {
+      margin: 3px 0;
+      font-size: 13px;
+    }
+
+    .totals {
+      margin-top: 14px;
+      background: linear-gradient(135deg, #f1f8ff, #eafff4);
+      border: 1px solid #caead8;
+      border-radius: 16px;
+      padding: 14px;
+      box-shadow: 0 10px 24px rgba(0, 43, 92, 0.08);
+    }
+
+    .total-line {
+      display: flex;
+      justify-content: space-between;
+      margin: 7px 0;
+    }
+
+    .total-line.final {
+      font-size: 22px;
+      font-weight: 900;
+      color: #003b7a;
+      border-top: 1px solid rgba(0, 87, 184, 0.18);
+      padding-top: 10px;
+      letter-spacing: -0.02em;
+    }
+
+    .aprovacao-box {
+      margin-top: 16px;
+      border: 1px solid #bceccc;
+      background: linear-gradient(135deg, #e9fff4, #f8fffb);
+      border-radius: 14px;
+      padding: 14px;
+      box-shadow: 0 10px 22px rgba(0, 168, 89, 0.10);
+    }
+
+    .aprovacao-box h3 {
+      margin: 0 0 8px;
+      color: #006b3a;
+      font-size: 16px;
+    }
+
+    .aprovacao-box p {
+      margin: 4px 0;
+      font-size: 13px;
     }
 
     .whatsapp-aprovar {
       min-height: 40px;
+      display: inline-flex !important;
+      margin-top: 10px;
+      align-items: center !important;
+      justify-content: center !important;
+      gap: 8px;
       padding: 10px 16px;
       border-radius: 999px;
+      background: linear-gradient(135deg, #08bd68, #007a41);
+      color: #ffffff;
+      text-decoration: none;
+      font-weight: 900;
       font-size: 13px;
+      text-align: center !important;
+      box-shadow: 0 12px 24px rgba(0, 168, 89, 0.24);
     }
 
-    @media (max-width: 700px) {
-      .form-section-title span {
-        width: 32px;
-        height: 32px;
-      }
-
-      .form-section-title strong {
-        font-size: 15px;
-      }
-
-      .form-section-title small {
-        font-size: 11.5px;
-      }
-
-      .btn,
-      .form-final-actions .btn {
-        min-height: 42px;
-      }
+    .whatsapp-aprovar:hover {
+      background: var(--verde-escuro);
     }
-  
 
-    /* =========================================================
-       REMOÇÃO DA NUMERAÇÃO VISUAL PESADA
-       Etapas com ícones e itens com marcador discreto
-       ========================================================= */
+    .preview-footer {
+      border-top: 1px solid #e5e7eb;
+      margin-top: 18px;
+      padding-top: 12px;
+      font-size: 12px;
+      color: #4b5563;
+    }
 
-    .form-section-title span,
-    .form-section-title .section-icon {
-      width: 32px;
-      height: 32px;
-      border-radius: 12px;
-      font-size: 15px;
-      letter-spacing: 0;
-      background: linear-gradient(135deg, #eef6ff, #eafff4);
-      color: var(--azul-escuro);
-      box-shadow: none;
+    .empty-box {
+      padding: 18px;
+      text-align: center;
+      color: #64748b;
+      border: 1px dashed var(--borda);
+      border-radius: 16px;
+      background: linear-gradient(135deg, #ffffff, #f8fbff);
+    }
+
+    .select-real-escondido {
+      position: absolute;
+      opacity: 0;
+      pointer-events: none;
+      height: 0;
+      min-height: 0;
+      padding: 0;
+      border: 0;
+    }
+
+    .cliente-picker-wrap,
+    .produto-picker-wrap,
+    .unidade-picker-wrap,
+    .status-picker-wrap {
+      position: relative;
+      overflow: visible !important;
+      z-index: 10000 !important;
+    }
+
+    .cliente-picker-btn,
+    .produto-picker-btn,
+    .unidade-picker-btn,
+    .status-picker-btn {
+      width: 100%;
+      min-height: 44px;
+      height: 44px;
+      border: 1px solid #d9e5f2;
+      border-radius: 13px;
+      background: #ffffff;
+      color: #12345a;
+      padding: 10px 12px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      font-size: 14px;
+      font-weight: 900;
+      cursor: pointer;
+      box-shadow: 0 4px 10px rgba(0, 43, 92, 0.04);
+      transition: border-color 0.18s ease, box-shadow 0.18s ease;
+    }
+
+    .cliente-picker-btn:hover,
+    .produto-picker-btn:hover,
+    .unidade-picker-btn:hover,
+    .status-picker-btn:hover,
+    .cliente-picker-btn:focus,
+    .produto-picker-btn:focus,
+    .unidade-picker-btn:focus,
+    .status-picker-btn:focus {
+      border-color: var(--azul);
+      box-shadow: 0 0 0 4px rgba(0, 87, 184, 0.10);
+      outline: none;
+    }
+
+    .cliente-picker-seta,
+    .produto-picker-seta,
+    .unidade-picker-seta,
+    .status-picker-seta {
+      width: 26px;
+      height: 26px;
+      border-radius: 9px;
+      background: linear-gradient(135deg, #f1f8ff, #eafff4);
       border: 1px solid #dceafa;
-    }
-
-    .form-section-title .section-icon {
+      color: #335b83;
       display: inline-flex;
       align-items: center;
       justify-content: center;
       flex: 0 0 auto;
+      font-size: 14px;
+      font-weight: 900;
+      transform: translateY(1px);
     }
 
-    .item-clean-index {
-      width: auto;
-      height: auto;
-      min-width: 34px;
-      padding: 5px 8px;
-      border-radius: 999px;
-      background: #eef6ff;
-      border: 1px solid #dceafa;
-      color: #335b83;
-      font-size: 12px;
-      box-shadow: none;
-    }
-
-    .item-clean-top {
-      grid-template-columns: auto minmax(0, 1fr) auto;
-    }
-
-    @media (max-width: 700px) {
-      .form-section-title span,
-      .form-section-title .section-icon {
-        width: 30px;
-        height: 30px;
-        font-size: 14px;
-      }
-    }
-  
-
-    /* =========================================================
-       REFINO FINAL - botões dentro da lista de produtos
-       Mantém diminuirQtdProdutoLista, aumentarQtdProdutoLista e adicionarProdutoDaLista
-       ========================================================= */
-
-    .produto-opcao-acoes {
-      background: #f8fbff;
-      border: 1px solid #e3edf8;
-      border-radius: 14px;
-      padding: 5px;
-      gap: 6px;
-      box-shadow: inset 0 0 0 1px rgba(255,255,255,.7);
-    }
-
-    .produto-opcao-qtd {
-      width: 82px;
-      height: 32px;
-      grid-template-columns: 24px minmax(0, 1fr) 24px;
-      border: 0;
-      border-radius: 11px;
+    .cliente-picker-lista,
+    .produto-picker-lista,
+    .unidade-picker-lista,
+    .status-picker-lista {
+      display: none;
+      position: absolute;
+      left: 10px;
+      right: 10px;
+      top: calc(100% - 4px);
+      z-index: 99999 !important;
       background: #ffffff;
-      box-shadow: 0 0 0 1px #dbe8f7;
-    }
-
-    .produto-opcao-qtd button {
-      width: 24px;
-      height: 32px;
-      border: 0;
-      background: transparent;
-      color: #315c87;
-      font-size: 15px;
-      font-weight: 900;
-      border-radius: 9px;
-      transition: background .15s ease, color .15s ease, transform .15s ease;
-    }
-
-    .produto-opcao-qtd button:hover {
-      background: #eef6ff;
-      color: var(--azul-escuro);
-      transform: none;
-    }
-
-    .produto-opcao-qtd input {
-      height: 32px;
-      min-height: 32px;
-      border: 0;
-      border-left: 1px solid #edf3fa;
-      border-right: 1px solid #edf3fa;
-      background: #ffffff;
-      color: #12345a;
-      font-size: 13px;
-      font-weight: 900;
-      text-align: center;
-      padding: 0 2px;
-    }
-
-    .produto-opcao-add-btn {
-      width: 32px;
-      height: 32px;
-      min-width: 32px;
-      border-radius: 11px;
-      background: linear-gradient(135deg, #00b965, #007a41);
-      color: #ffffff;
-      font-size: 21px;
-      font-weight: 900;
-      box-shadow: 0 6px 13px rgba(0,168,89,.20);
-      transition: transform .15s ease, box-shadow .15s ease, filter .15s ease;
-    }
-
-    .produto-opcao-add-btn:hover {
-      transform: translateY(-1px);
-      filter: brightness(.98);
-      box-shadow: 0 9px 18px rgba(0,168,89,.26);
-    }
-
-    .produto-opcao-add-btn:active {
-      transform: translateY(0);
-      box-shadow: 0 5px 11px rgba(0,168,89,.18);
-    }
-
-    .produto-opcao-add {
-      align-items: center;
+      border: 1px solid #dbe8f7;
       border-radius: 16px;
+      box-shadow: 0 20px 40px rgba(0, 43, 92, 0.18);
+      padding: 8px;
+      max-height: 280px;
+      overflow: auto;
     }
 
-    @media (max-width: 560px) {
-      .produto-opcao-acoes {
-        width: 100%;
-        justify-content: flex-end;
-      }
-
-      .produto-opcao-qtd {
-        width: 96px;
-      }
+    .unidade-picker-lista {
+      left: 0;
+      right: 0;
+      top: calc(100% + 6px);
     }
-  
 
-    /* =========================================================
-       LISTA DE PRODUTOS SIMPLES
-       Produto à esquerda e botão + ao lado direito
-       ========================================================= */
+    .cliente-picker-lista.open,
+    .produto-picker-lista.open,
+    .unidade-picker-lista.open,
+    .status-picker-lista.open {
+      display: grid;
+      gap: 6px;
+      z-index: 99999 !important;
+    }
+
+    .cliente-picker-opcao,
+    .unidade-picker-opcao,
+    .status-picker-opcao {
+      border: 0;
+      width: 100%;
+      text-align: left;
+      background: #ffffff;
+      border-radius: 13px;
+      padding: 10px 11px;
+      cursor: pointer;
+      color: #172033;
+      transition: background 0.18s ease, transform 0.18s ease;
+    }
+
+    .cliente-picker-opcao {
+      display: grid;
+      gap: 3px;
+    }
+
+    .unidade-picker-opcao {
+      display: grid;
+      gap: 3px;
+    }
+
+    .status-picker-opcao {
+      display: grid;
+      grid-template-columns: 12px minmax(0, 1fr);
+      gap: 10px;
+      align-items: center;
+    }
+
+    .cliente-picker-opcao:hover,
+    .unidade-picker-opcao:hover,
+    .unidade-picker-opcao.active,
+    .status-picker-opcao:hover,
+    .status-picker-opcao.active {
+      background: linear-gradient(135deg, #eef6ff, #eafff4);
+      transform: translateX(2px);
+    }
+
+    .cliente-picker-opcao strong,
+    .unidade-picker-opcao strong,
+    .status-picker-opcao strong {
+      display: block;
+      color: #12345a;
+      font-size: 13.5px;
+      font-weight: 900;
+    }
+
+    .cliente-picker-opcao span,
+    .unidade-picker-opcao span,
+    .status-picker-opcao small,
+    .cliente-picker-vazio,
+    .produto-picker-vazio {
+      display: block;
+      color: #64748b;
+      font-size: 11.5px;
+      font-weight: 700;
+    }
+
+    #statusPickerTexto {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .status-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      display: inline-block;
+      flex: 0 0 auto;
+      box-shadow: 0 0 0 3px rgba(0, 0, 0, 0.04);
+    }
+
+    .status-dot.aberto {
+      background: #0057b8;
+    }
+
+    .status-dot.aprovado {
+      background: #00a859;
+    }
+
+    .status-dot.recusado {
+      background: #dc2626;
+    }
+
+    .status-dot.cancelado {
+      background: #64748b;
+    }
 
     .produto-opcao-simples {
+      display: grid !important;
       grid-template-columns: minmax(0, 1fr) 38px !important;
       gap: 10px !important;
       align-items: center !important;
@@ -2201,27 +983,39 @@
       border-radius: 16px !important;
       background: #ffffff !important;
       border: 1px solid #e2edf8 !important;
+      transition: background 0.18s ease;
     }
 
     .produto-opcao-simples:hover {
       background: linear-gradient(135deg, #f8fbff, #f3fff8) !important;
     }
 
-    .produto-opcao-simples .produto-opcao-info {
+    .produto-opcao-info {
+      border: 0;
       width: 100%;
       min-width: 0;
+      background: transparent;
+      text-align: left;
+      cursor: pointer;
+      display: grid;
+      gap: 4px;
       padding: 2px 4px;
+      border-radius: 11px;
     }
 
-    .produto-opcao-simples .produto-opcao-info strong {
-      font-size: 14px;
+    .produto-opcao-info:hover {
+      background: #f6fbff;
+    }
+
+    .produto-opcao-info strong {
       color: #12345a;
+      font-size: 14px;
       line-height: 1.25;
     }
 
-    .produto-opcao-simples .produto-opcao-info span {
-      font-size: 12px;
+    .produto-opcao-info span {
       color: #64748b;
+      font-size: 12px;
     }
 
     .produto-add-lateral {
@@ -2237,122 +1031,31 @@
       background: linear-gradient(135deg, #00b965, #007a41) !important;
       color: #ffffff !important;
       border: 2px solid #ffffff !important;
-      box-shadow: 0 8px 18px rgba(0,168,89,.24), 0 0 0 1px rgba(0,168,89,.16) !important;
+      box-shadow:
+        0 8px 18px rgba(0, 168, 89, 0.24),
+        0 0 0 1px rgba(0, 168, 89, 0.16) !important;
       display: inline-flex !important;
       align-items: center !important;
       justify-content: center !important;
       flex: 0 0 34px !important;
+      cursor: pointer;
+      transition: transform 0.15s ease, box-shadow 0.15s ease, filter 0.15s ease;
     }
 
     .produto-add-lateral:hover {
       transform: translateY(-1px) scale(1.03);
-      box-shadow: 0 11px 22px rgba(0,168,89,.30), 0 0 0 1px rgba(0,168,89,.18) !important;
-      filter: brightness(.98);
+      box-shadow:
+        0 11px 22px rgba(0, 168, 89, 0.30),
+        0 0 0 1px rgba(0, 168, 89, 0.18) !important;
+      filter: brightness(0.98);
     }
 
     .produto-add-lateral:active {
-      transform: translateY(0) scale(.98);
-      box-shadow: 0 6px 14px rgba(0,168,89,.22), 0 0 0 1px rgba(0,168,89,.16) !important;
+      transform: translateY(0) scale(0.98);
+      box-shadow:
+        0 6px 14px rgba(0, 168, 89, 0.22),
+        0 0 0 1px rgba(0, 168, 89, 0.16) !important;
     }
-  
-
-    /* =========================================================
-       CONTROLE DE QUANTIDADE NOS ITENS ADICIONADOS
-       Mais elegante, mantendo alterarQtd()
-       ========================================================= */
-
-    .item-qtd-control {
-      height: 40px;
-      display: grid;
-      grid-template-columns: 30px minmax(0, 1fr) 30px;
-      border: 1px solid #d9e5f2;
-      border-radius: 13px;
-      overflow: hidden;
-      background: #ffffff;
-    }
-
-    .item-qtd-control button {
-      border: 0;
-      background: #eef6ff;
-      color: var(--azul-escuro);
-      font-size: 17px;
-      font-weight: 900;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      transition: background .15s ease, color .15s ease;
-      padding: 0;
-      min-height: 0;
-      box-shadow: none;
-    }
-
-    .item-qtd-control button:hover {
-      background: #dcecff;
-      color: #003b7a;
-    }
-
-    .item-qtd-control input {
-      border: 0 !important;
-      border-left: 1px solid #d9e5f2 !important;
-      border-right: 1px solid #d9e5f2 !important;
-      border-radius: 0 !important;
-      height: 38px !important;
-      min-height: 38px !important;
-      text-align: center !important;
-      font-size: 16px !important;
-      font-weight: 900 !important;
-      padding: 0 4px !important;
-      background: #ffffff !important;
-      box-shadow: none !important;
-      -moz-appearance: textfield;
-    }
-
-    .item-qtd-control input::-webkit-outer-spin-button,
-    .item-qtd-control input::-webkit-inner-spin-button {
-      -webkit-appearance: none;
-      margin: 0;
-    }
-
-    .item-clean-qtd {
-      padding: 8px;
-    }
-  
-
-    /* =========================================================
-       INPUT DE QUANTIDADE SIMPLES E BONITO
-       Sem botões extras. Mantém alterarQtd().
-       ========================================================= */
-
-    .qtd-input-bonito {
-      width: 100% !important;
-      height: 40px !important;
-      min-height: 40px !important;
-      border-radius: 12px !important;
-      text-align: center !important;
-      font-size: 17px !important;
-      font-weight: 900 !important;
-      color: #12345a !important;
-      background: #ffffff !important;
-      border: 1px solid #d9e5f2 !important;
-      padding: 6px 8px !important;
-      box-shadow: inset 0 0 0 1px rgba(255,255,255,.7) !important;
-    }
-
-    .qtd-input-bonito:focus {
-      border-color: var(--azul) !important;
-      box-shadow: 0 0 0 4px rgba(0,87,184,.10) !important;
-    }
-
-    .item-clean-qtd {
-      padding: 8px;
-    }
-  
-
-    /* =========================================================
-       ITENS DO ORÇAMENTO - versão mais clara e editável
-       Mostra quantidade, valor unitário editável e total do item
-       ========================================================= */
 
     .orc-item-modern {
       background: #ffffff;
@@ -2422,7 +1125,7 @@
       font-weight: 900;
       cursor: pointer;
       white-space: nowrap;
-      transition: background .15s ease, color .15s ease, transform .15s ease;
+      transition: background 0.15s ease, color 0.15s ease, transform 0.15s ease;
     }
 
     .orc-item-modern-remove:hover {
@@ -2430,36 +1133,47 @@
       color: #ffffff;
       transform: translateY(-1px);
     }
-
-    .orc-item-modern-grid {
+        .orc-item-modern-grid {
       display: grid;
-      grid-template-columns: 88px minmax(0, 1fr) minmax(0, 1fr);
+      grid-template-columns: 96px minmax(0, 1fr);
       gap: 9px;
       align-items: stretch;
     }
 
     .orc-item-modern-field {
+      min-width: 0;
+      overflow: hidden;
       background: #f8fbff;
       border: 1px solid #e4edf7;
       border-radius: 14px;
       padding: 9px;
-      min-width: 0;
+    }
+
+    .orc-item-modern-field.total-item {
+      grid-column: 1 / -1;
     }
 
     .orc-item-modern-field label {
       display: block;
       margin-bottom: 6px;
       color: #64748b;
-      font-size: 10.5px;
+      font-size: 10px;
       font-weight: 900;
       text-transform: uppercase;
-      letter-spacing: .035em;
-      white-space: nowrap;
+      letter-spacing: 0.025em;
+      white-space: normal;
+      line-height: 1.15;
+    }
+
+    .orc-item-modern-field input,
+    .orc-item-modern-total {
+      width: 100%;
+      max-width: 100%;
+      min-width: 0;
+      box-sizing: border-box;
     }
 
     .orc-item-modern-field input {
-      width: 100%;
-      min-width: 0;
       height: 40px;
       border: 1px solid #d9e5f2;
       border-radius: 12px;
@@ -2488,17 +1202,145 @@
       border: 1px solid #c6efd6;
       background: linear-gradient(135deg, #e8fff4, #f7fffb);
       color: #006b3a;
-      font-size: 14.5px;
+      font-size: 15px;
       font-weight: 900;
       display: flex;
       align-items: center;
-      justify-content: flex-end;
-      padding: 7px 8px;
+      justify-content: space-between;
+      padding: 8px 10px;
       white-space: nowrap;
       overflow: hidden;
     }
 
+    .orc-item-modern-total::before {
+      content: "Total do item";
+      color: #007a41;
+      font-size: 12px;
+      font-weight: 800;
+      margin-right: 10px;
+    }
+
+    #empresa .card {
+      max-width: 980px;
+      min-height: 180px;
+      margin: 0 auto;
+      border-top: 4px solid var(--verde);
+    }
+
+    #empresa input[type="file"] {
+      padding: 12px;
+      background: #f8fbff;
+    }
+
+    #empresa .field p.muted {
+      margin: 7px 0 0;
+      padding: 9px 11px;
+      background: #f8fbff;
+      border: 1px solid #edf1f7;
+      border-radius: 12px;
+    }
+
+    #clientes .card,
+    #produtos .card,
+    #lista .card {
+      min-height: 180px;
+    }
+
+    @media (max-width: 1000px) {
+      .grid-2,
+      .row,
+      .box-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .form-card {
+        position: static;
+      }
+
+      .orc-head {
+        flex-direction: column;
+      }
+
+      .orc-info {
+        text-align: left;
+      }
+    }
+
     @media (max-width: 700px) {
+      header {
+        padding: 18px 16px;
+      }
+
+      header h1 {
+        font-size: 20px;
+      }
+
+      .tabs {
+        justify-content: stretch;
+        padding: 10px;
+        gap: 7px;
+      }
+
+      .tabs button {
+        flex: 1 1 calc(50% - 8px);
+        min-width: 0;
+        min-height: 46px;
+        padding: 10px 11px;
+        font-size: 13px;
+        white-space: normal;
+      }
+
+      .wrap {
+        padding: 12px;
+      }
+
+      .card {
+        border-radius: 18px;
+        padding: 16px;
+      }
+
+      .form-section-box {
+        padding: 12px;
+        border-radius: 18px;
+      }
+
+      .form-final-actions {
+        position: static;
+      }
+
+      .form-final-actions .btn,
+      .actions .btn,
+      .preview-bar .actions .btn {
+        width: 100%;
+        min-width: 0;
+      }
+
+      .preview-bar .actions {
+        width: 100%;
+      }
+
+      .preview-bar .btn {
+        flex: 1 1 100%;
+      }
+
+      .card h2 {
+        font-size: 19px;
+      }
+
+      .form-section-title .section-icon {
+        width: 30px;
+        height: 30px;
+        font-size: 14px;
+      }
+
+      .form-section-title strong {
+        font-size: 15px;
+      }
+
+      .form-section-title small {
+        font-size: 11.5px;
+      }
+
       .orc-item-modern-header {
         flex-direction: column;
       }
@@ -2511,718 +1353,1081 @@
         grid-template-columns: 1fr;
       }
 
+      .orc-item-modern-field.total-item {
+        grid-column: auto;
+      }
+
       .orc-item-modern-field input,
       .orc-item-modern-total {
         font-size: 16px;
       }
-    }
-  
 
-    /* =========================================================
-       CORREÇÃO DOS ITENS - sem cortar textos ou valores
-       Qtd. e valor lado a lado; total em linha completa
-       ========================================================= */
-
-    .orc-item-modern-grid {
-      display: grid;
-      grid-template-columns: 96px minmax(0, 1fr);
-      gap: 9px;
-      align-items: stretch;
-    }
-
-    .orc-item-modern-field {
-      min-width: 0;
-      overflow: hidden;
-    }
-
-    .orc-item-modern-field.total-item {
-      grid-column: 1 / -1;
-    }
-
-    .orc-item-modern-field label {
-      font-size: 10px;
-      letter-spacing: .025em;
-      white-space: normal;
-      line-height: 1.15;
-    }
-
-    .orc-item-modern-field input,
-    .orc-item-modern-total {
-      width: 100%;
-      max-width: 100%;
-      min-width: 0;
-      box-sizing: border-box;
-    }
-
-    .orc-item-modern-total {
-      justify-content: space-between;
-      font-size: 15px;
-      padding: 8px 10px;
-    }
-
-    .orc-item-modern-total::before {
-      content: "Total do item";
-      color: #007a41;
-      font-size: 12px;
-      font-weight: 800;
-      margin-right: 10px;
-    }
-
-    @media (max-width: 430px) {
-      .orc-item-modern-grid {
-        grid-template-columns: 1fr;
+      table.responsive,
+      table.responsive thead,
+      table.responsive tbody,
+      table.responsive tr,
+      table.responsive th,
+      table.responsive td {
+        display: block;
       }
 
-      .orc-item-modern-field.total-item {
-        grid-column: auto;
+      table.responsive thead {
+        display: none;
+      }
+
+      table.responsive tr {
+        border: 1px solid #e5e7eb;
+        border-radius: 14px;
+        margin-bottom: 10px;
+        overflow: hidden;
+      }
+
+      table.responsive td {
+        display: flex;
+        justify-content: space-between;
+        gap: 10px;
+      }
+
+      table.responsive td::before {
+        content: attr(data-label);
+        font-weight: 900;
+        color: var(--azul-escuro);
+      }
+
+      #previewOrcamento {
+        padding: 18px;
       }
     }
-  
 
-    /* =========================================================
-       SELECTS MODERNOS - status, unidade e setas
-       Somente visual. Não altera lógica dos campos.
-       ========================================================= */
+    @media print {
+      @page {
+        size: A4 portrait;
+        margin: 8mm;
+      }
 
-    select {
-      appearance: none;
-      -webkit-appearance: none;
-      -moz-appearance: none;
-      cursor: pointer;
-      background-image:
-        linear-gradient(45deg, transparent 50%, #335b83 50%),
-        linear-gradient(135deg, #335b83 50%, transparent 50%),
-        linear-gradient(135deg, #eef6ff, #eafff4);
-      background-position:
-        calc(100% - 20px) 50%,
-        calc(100% - 14px) 50%,
-        calc(100% - 42px) 50%;
-      background-size:
-        6px 6px,
-        6px 6px,
-        30px 30px;
-      background-repeat: no-repeat;
-      padding-right: 52px !important;
+      header,
+      .tabs,
+      .no-print,
+      .form-card {
+        display: none !important;
+      }
+
+      html,
+      body {
+        background: #ffffff;
+      }
+
+      .wrap {
+        padding: 0;
+        max-width: none;
+      }
+
+      .grid-2 {
+        display: block;
+      }
+
+      .card {
+        box-shadow: none;
+        border: 0;
+        padding: 0;
+      }
+
+      #previewOrcamento {
+        border: 0;
+        border-radius: 0;
+        min-height: auto;
+        width: 100%;
+        max-width: 100%;
+        padding: 0;
+        box-shadow: none;
+      }
+
+      .orc-head {
+        padding-bottom: 12px;
+        margin-bottom: 14px;
+      }
+
+      .company h2 {
+        font-size: 18px;
+      }
+
+      .company p,
+      .orc-info p {
+        font-size: 11px;
+      }
+
+      .orc-info h1 {
+        font-size: 25px;
+      }
+
+      .logo-box {
+        width: 60px;
+        height: 60px;
+      }
+
+      .box-grid {
+        gap: 10px;
+        margin-bottom: 12px;
+      }
+
+      .box {
+        padding: 10px;
+      }
+
+      .box h3 {
+        font-size: 14px;
+        margin-bottom: 6px;
+      }
+
+      .box p {
+        font-size: 12px;
+      }
+
+      #previewOrcamento table th,
+      #previewOrcamento table td {
+        padding: 7px 8px;
+        font-size: 12px;
+      }
+
+      .totals {
+        padding: 10px;
+        margin-top: 10px;
+      }
+
+      .total-line {
+        font-size: 13px;
+        margin: 5px 0;
+      }
+
+      .total-line.final {
+        font-size: 19px;
+        padding-top: 8px;
+      }
+
+      .aprovacao-box {
+        padding: 10px;
+        margin-top: 10px;
+      }
+
+      .aprovacao-box h3 {
+        font-size: 14px;
+        margin-bottom: 5px;
+      }
+
+      .aprovacao-box p {
+        font-size: 12px;
+      }
+
+      .whatsapp-aprovar {
+        display: inline-flex;
+        font-size: 12px;
+        padding: 8px 10px;
+      }
+
+      .preview-footer {
+        font-size: 10px;
+        margin-top: 10px;
+        padding-top: 8px;
+      }
     }
+    /* CORREÇÃO DEFINITIVA DAS LISTAS FICANDO ATRÁS */
 
-    select:hover {
-      border-color: #a9c9ea;
-      background-color: #ffffff;
-    }
+.form-card,
+.card,
+.form-section-box,
+.field,
+.field-modern,
+.cliente-picker-wrap,
+.produto-picker-wrap,
+.unidade-picker-wrap,
+.status-picker-wrap {
+  overflow: visible !important;
+}
 
-    select:focus {
-      border-color: var(--azul);
-      box-shadow: 0 0 0 4px rgba(0, 87, 184, 0.10);
-    }
+/* Garante que o bloco que tem lista aberta fique acima dos outros */
+.form-section-box {
+  position: relative;
+  z-index: 1;
+}
 
-    #orcStatus,
-    #produtoUn {
-      font-weight: 900;
-      color: #12345a;
-      background-color: #ffffff;
-      border: 1px solid #d9e5f2;
-      border-radius: 13px;
-      min-height: 44px;
-    }
+.form-section-box:has(.cliente-picker-lista.open),
+.form-section-box:has(.produto-picker-lista.open),
+.form-section-box:has(.unidade-picker-lista.open),
+.form-section-box:has(.status-picker-lista.open) {
+  z-index: 999999 !important;
+}
 
-    #orcStatus option,
-    #produtoUn option {
-      color: #172033;
-      font-weight: 700;
-      background: #ffffff;
-    }
+/* Camada dos campos modernos */
+.cliente-picker-wrap,
+.produto-picker-wrap,
+.unidade-picker-wrap,
+.status-picker-wrap {
+  position: relative !important;
+  z-index: 999999 !important;
+}
 
-    .cliente-picker-seta,
-    .produto-picker-seta {
-      font-size: 14px !important;
-      font-weight: 900;
-      transform: translateY(1px);
-      background: linear-gradient(135deg, #f1f8ff, #eafff4) !important;
-      border: 1px solid #dceafa;
-      color: #335b83 !important;
-    }
+/* Camada das listas abertas */
+.cliente-picker-lista,
+.produto-picker-lista,
+.unidade-picker-lista,
+.status-picker-lista {
+  z-index: 9999999 !important;
+}
 
-    .cliente-picker-btn,
-    .produto-picker-btn {
-      padding-right: 10px;
-    }
-
-    .cliente-picker-btn:hover .cliente-picker-seta,
-    .produto-picker-btn:hover .produto-picker-seta {
-      background: linear-gradient(135deg, #e5f1ff, #dcffef) !important;
-      color: var(--azul-escuro) !important;
-    }
-
-    .field-modern select,
-    #produtos select {
-      box-shadow: inset 0 0 0 1px rgba(255,255,255,.70);
-    }
-  
-
-    /* =========================================================
-       LISTA MODERNA DE UNIDADE DO PRODUTO
-       Mantém o select produtoUn escondido para não quebrar o cadastro
-       ========================================================= */
-
-    .unidade-picker-wrap {
-      position: relative;
-      overflow: visible;
-      z-index: 16;
-    }
-
-    .unidade-picker-btn {
-      width: 100%;
-      min-height: 44px;
-      border: 1px solid #d9e5f2;
-      border-radius: 13px;
-      background: #ffffff;
-      color: #12345a;
-      padding: 10px 12px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 12px;
-      font-size: 14px;
-      font-weight: 900;
-      cursor: pointer;
-      box-shadow: 0 4px 10px rgba(0,43,92,.04);
-      transition: border-color .18s ease, box-shadow .18s ease;
-    }
-
-    .unidade-picker-btn:hover,
-    .unidade-picker-btn:focus {
-      border-color: var(--azul);
-      box-shadow: 0 0 0 4px rgba(0,87,184,.10);
-      outline: none;
-    }
-
-    .unidade-picker-seta {
-      width: 26px;
-      height: 26px;
-      border-radius: 9px;
-      background: linear-gradient(135deg, #f1f8ff, #eafff4);
-      border: 1px solid #dceafa;
-      color: #335b83;
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      flex: 0 0 auto;
-      font-size: 14px;
-      font-weight: 900;
-    }
-
-    .unidade-picker-lista {
-      display: none;
-      position: absolute;
-      left: 0;
-      right: 0;
-      top: calc(100% + 6px);
-      z-index: 1000;
-      background: #ffffff;
-      border: 1px solid #dbe8f7;
-      border-radius: 16px;
-      box-shadow: 0 20px 40px rgba(0,43,92,.18);
-      padding: 8px;
-      max-height: 260px;
-      overflow: auto;
-    }
-
-    .unidade-picker-lista.open {
-      display: grid;
-      gap: 6px;
-    }
-
-    .unidade-picker-opcao {
-      border: 0;
-      width: 100%;
-      text-align: left;
-      background: #ffffff;
-      border-radius: 13px;
-      padding: 10px 11px;
-      cursor: pointer;
-      display: grid;
-      gap: 3px;
-      color: #172033;
-      transition: background .18s ease, transform .18s ease;
-    }
-
-    .unidade-picker-opcao:hover,
-    .unidade-picker-opcao.active {
-      background: linear-gradient(135deg, #eef6ff, #eafff4);
-    }
-
-    .unidade-picker-opcao:hover {
-      transform: translateX(2px);
-    }
-
-    .unidade-picker-opcao strong {
-      color: #12345a;
-      font-size: 13.5px;
-      font-weight: 900;
-    }
-
-    .unidade-picker-opcao span {
-      color: #64748b;
-      font-size: 11.5px;
-      font-weight: 700;
-    }
-  
-
-    /* =========================================================
-       LISTA MODERNA DE STATUS DO ORÇAMENTO
-       Mantém o select orcStatus escondido para preservar a lógica
-       ========================================================= */
-
-    .status-picker-wrap {
-      position: relative;
-      overflow: visible;
-      z-index: 17;
-    }
-
-    .status-picker-btn {
-      width: 100%;
-      min-height: 44px;
-      border: 1px solid #d9e5f2;
-      border-radius: 13px;
-      background: #ffffff;
-      color: #12345a;
-      padding: 10px 12px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 12px;
-      font-size: 14px;
-      font-weight: 900;
-      cursor: pointer;
-      box-shadow: 0 4px 10px rgba(0,43,92,.04);
-      transition: border-color .18s ease, box-shadow .18s ease;
-    }
-
-    #statusPickerTexto {
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-    }
-
-    .status-picker-btn:hover,
-    .status-picker-btn:focus {
-      border-color: var(--azul);
-      box-shadow: 0 0 0 4px rgba(0,87,184,.10);
-      outline: none;
-    }
-
-    .status-picker-seta {
-      width: 26px;
-      height: 26px;
-      border-radius: 9px;
-      background: linear-gradient(135deg, #f1f8ff, #eafff4);
-      border: 1px solid #dceafa;
-      color: #335b83;
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      flex: 0 0 auto;
-      font-size: 14px;
-      font-weight: 900;
-    }
-
-    .status-picker-lista {
-      display: none;
-      position: absolute;
-      left: 10px;
-      right: 10px;
-      top: calc(100% - 4px);
-      z-index: 1000;
-      background: #ffffff;
-      border: 1px solid #dbe8f7;
-      border-radius: 16px;
-      box-shadow: 0 20px 40px rgba(0,43,92,.18);
-      padding: 8px;
-      max-height: 260px;
-      overflow: auto;
-    }
-
-    .status-picker-lista.open {
-      display: grid;
-      gap: 6px;
-    }
-
-    .status-picker-opcao {
-      border: 0;
-      width: 100%;
-      text-align: left;
-      background: #ffffff;
-      border-radius: 13px;
-      padding: 10px 11px;
-      cursor: pointer;
-      display: grid;
-      grid-template-columns: 12px minmax(0,1fr);
-      gap: 10px;
-      align-items: center;
-      color: #172033;
-      transition: background .18s ease, transform .18s ease;
-    }
-
-    .status-picker-opcao:hover,
-    .status-picker-opcao.active {
-      background: linear-gradient(135deg, #eef6ff, #eafff4);
-    }
-
-    .status-picker-opcao:hover {
-      transform: translateX(2px);
-    }
-
-    .status-picker-opcao strong {
-      display: block;
-      color: #12345a;
-      font-size: 13.5px;
-      font-weight: 900;
-    }
-
-    .status-picker-opcao small {
-      display: block;
-      margin-top: 2px;
-      color: #64748b;
-      font-size: 11.5px;
-      font-weight: 700;
-    }
-
-    .status-dot {
-      width: 10px;
-      height: 10px;
-      border-radius: 50%;
-      display: inline-block;
-      flex: 0 0 auto;
-      box-shadow: 0 0 0 3px rgba(0,0,0,.04);
-    }
-
-    .status-dot.aberto { background: #0057b8; }
-    .status-dot.aprovado { background: #00a859; }
-    .status-dot.recusado { background: #dc2626; }
-    .status-dot.cancelado { background: #64748b; }
-  
-
-    /* =========================================================
-       CORREÇÃO DE SOBREPOSIÇÃO DAS LISTAS MODERNAS
-       Faz status, unidade, cliente e produtos abrirem por cima
-       ========================================================= */
-
-    .form-card,
-    .form-section-box,
-    .field-modern,
-    .status-picker-wrap,
-    .unidade-picker-wrap,
-    .cliente-picker-wrap,
-    .produto-picker-wrap {
-      overflow: visible !important;
-    }
-
-    .form-section-box {
-      position: relative;
-      z-index: 1;
-    }
-
-    .form-section-box:has(.status-picker-lista.open),
-    .form-section-box:has(.unidade-picker-lista.open),
-    .form-section-box:has(.cliente-picker-lista.open),
-    .form-section-box:has(.produto-picker-lista.open) {
-      z-index: 9999;
-    }
-
-    .status-picker-wrap,
-    .unidade-picker-wrap,
-    .cliente-picker-wrap,
-    .produto-picker-wrap {
-      position: relative;
-      z-index: 10000 !important;
-    }
-
-    .status-picker-lista,
-    .unidade-picker-lista,
-    .cliente-picker-lista,
-    .produto-picker-lista {
-      z-index: 99999 !important;
-    }
-
-    .status-picker-lista.open,
-    .unidade-picker-lista.open,
-    .cliente-picker-lista.open,
-    .produto-picker-lista.open {
-      z-index: 99999 !important;
-    }
+/* Quando abrir, força aparecer por cima */
+.cliente-picker-lista.open,
+.produto-picker-lista.open,
+.unidade-picker-lista.open,
+.status-picker-lista.open {
+  position: absolute !important;
+  z-index: 9999999 !important;
+}
   </style>
 </head>
+
 <body>
-  <header><div><h1>ViaTec | Sistema de Orçamentos</h1><small>Cadastre, monte e visualize o orçamento na mesma tela.</small></div><strong id="dataHoje"></strong></header>
-  <div class="tabs no-print"><button class="active" onclick="abrirAba('orcamento',this)">🧾 Fazer orçamento</button><button onclick="abrirAba('clientes',this)">👤 Clientes</button><button onclick="abrirAba('produtos',this)">📦 Produtos/Serviços</button><button onclick="abrirAba('lista',this)">📁 Orçamentos salvos</button><button onclick="abrirAba('empresa',this)">⚙️ Empresa</button></div>
+  <header>
+    <div>
+      <h1>ViaTec | Sistema de Orçamentos</h1>
+      <small>Cadastre, monte e visualize o orçamento na mesma tela.</small>
+    </div>
+
+    <strong id="dataHoje"></strong>
+  </header>
+
+  <div class="tabs no-print">
+    <button class="active" onclick="abrirAba('orcamento', this)">🧾 Fazer orçamento</button>
+    <button onclick="abrirAba('clientes', this)">👤 Clientes</button>
+    <button onclick="abrirAba('produtos', this)">📦 Produtos/Serviços</button>
+    <button onclick="abrirAba('lista', this)">📁 Orçamentos salvos</button>
+    <button onclick="abrirAba('empresa', this)">⚙️ Empresa</button>
+  </div>
+
   <main class="wrap">
-    <section id="orcamento" class="section active"><div class="grid grid-2"><div class="card form-card"><h2>Montar orçamento</h2>
+    <section id="orcamento" class="section active">
+      <div class="grid grid-2">
+        <div class="card form-card">
+          <h2>Montar orçamento</h2>
 
-      <div class="form-section-box">
-        <div class="form-section-title"><span class="section-icon">👤</span><div><strong>Dados do cliente</strong><small>Escolha o cliente, data e validade</small></div></div>
-        <div class="field field-modern cliente-picker-wrap">
-          <label>Cliente</label>
-          <select id="orcCliente" onchange="atualizarPreview()" class="select-real-escondido"></select>
-          <button class="cliente-picker-btn" type="button" onclick="toggleClientePicker()">
-            <span id="clientePickerTexto">Selecione o cliente</span>
-            <span class="cliente-picker-seta">▾</span>
+          <div class="form-section-box">
+            <div class="form-section-title">
+              <span class="section-icon">👤</span>
+              <div>
+                <strong>Dados do cliente</strong>
+                <small>Escolha o cliente, data e validade</small>
+              </div>
+            </div>
+
+            <div class="field field-modern cliente-picker-wrap">
+              <label>Cliente</label>
+
+              <select id="orcCliente" onchange="atualizarPreview()" class="select-real-escondido"></select>
+
+              <button class="cliente-picker-btn" type="button" onclick="toggleClientePicker()">
+                <span id="clientePickerTexto">Selecione o cliente</span>
+                <span class="cliente-picker-seta">▾</span>
+              </button>
+
+              <div class="cliente-picker-lista" id="clientePickerLista"></div>
+            </div>
+
+            <div class="row">
+              <div class="field field-modern">
+                <label>Data</label>
+                <input id="orcData" type="date" onchange="atualizarPreview()" />
+              </div>
+
+              <div class="field field-modern">
+                <label>Validade</label>
+                <input id="orcValidade" type="date" onchange="atualizarPreview()" />
+              </div>
+            </div>
+
+            <div class="row">
+              <div class="field field-modern status-picker-wrap">
+                <label>Status</label>
+
+                <select id="orcStatus" onchange="atualizarPreview()" class="select-real-escondido">
+                  <option value="aberto">Aberto</option>
+                  <option value="aprovado">Aprovado</option>
+                  <option value="recusado">Recusado</option>
+                  <option value="cancelado">Cancelado</option>
+                </select>
+
+                <button class="status-picker-btn" type="button" onclick="toggleStatusPicker()">
+                  <span id="statusPickerTexto">Aberto</span>
+                  <span class="status-picker-seta">▾</span>
+                </button>
+
+                <div class="status-picker-lista" id="statusPickerLista"></div>
+              </div>
+
+              <div class="field field-modern">
+                <label>Desconto R$</label>
+                <input
+                  id="orcDesconto"
+                  type="number"
+                  step="0.01"
+                  min="0"
+                  value="0"
+                  oninput="atualizarPreview()"
+                  placeholder="0,00"
+                />
+              </div>
+            </div>
+          </div>
+
+          <div class="form-section-box add-item-panel">
+            <div class="form-section-title">
+              <span class="section-icon">＋</span>
+              <div>
+                <strong>Adicionar produtos</strong>
+                <small>Abra a lista e adicione os itens</small>
+              </div>
+            </div>
+
+            <div class="produto-add-list-only">
+              <div class="produto-picker-wrap produto-picker-line">
+                <label>Produto/Serviço</label>
+
+                <select id="produtoSelecionado" class="select-real-escondido"></select>
+                <input id="itemQtd" type="hidden" value="1" />
+
+                <button class="produto-picker-btn" type="button" onclick="toggleProdutoPicker()">
+                  <span id="produtoPickerTexto">Selecione o produto/serviço</span>
+                  <span class="produto-picker-seta">▾</span>
+                </button>
+
+                <div class="produto-picker-lista" id="produtoPickerLista"></div>
+              </div>
+            </div>
+
+            <button class="btn btn-light manual-btn" type="button" onclick="adicionarManual()">
+              + Adicionar item manual
+            </button>
+          </div>
+
+          <div class="form-section-box">
+            <div class="form-section-title">
+              <span class="section-icon">🧾</span>
+              <div>
+                <strong>Itens do orçamento</strong>
+                <small>Edite quantidade, valor e subtotal</small>
+              </div>
+            </div>
+
+            <div id="itensTela"></div>
+          </div>
+
+          <div class="form-section-box">
+            <div class="form-section-title">
+              <span class="section-icon">💳</span>
+              <div>
+                <strong>Pagamento e observações</strong>
+                <small>Informe condições e detalhes finais</small>
+              </div>
+            </div>
+
+            <div class="field field-modern">
+              <label>Descrição de pagamento</label>
+              <textarea
+                id="orcPagamento"
+                placeholder="Ex: 50% de entrada via Pix e restante na conclusão."
+                oninput="atualizarPreview()"
+              ></textarea>
+            </div>
+
+            <div class="field field-modern">
+              <label>Observações</label>
+              <textarea
+                id="orcObs"
+                oninput="atualizarPreview()"
+                placeholder="Observações do orçamento..."
+              ></textarea>
+            </div>
+          </div>
+
+          <div class="actions form-final-actions">
+            <button class="btn btn-primary" type="button" onclick="salvarOrcamento()">
+              Salvar orçamento
+            </button>
+
+            <button class="btn btn-light" type="button" onclick="limparOrcamento()">
+              Novo/Limpar
+            </button>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="preview-bar no-print">
+            <h2 style="margin:0;">Pré-visualização</h2>
+
+            <div class="actions" style="margin:0;">
+              <button class="btn btn-light" type="button" onclick="window.print()">Imprimir</button>
+              <button class="btn btn-success" type="button" onclick="baixarPDF()">Baixar PDF</button>
+              <button class="btn btn-success" type="button" onclick="enviarWhatsApp()">WhatsApp</button>
+            </div>
+          </div>
+
+          <div id="previewOrcamento"></div>
+        </div>
+      </div>
+    </section>
+
+    <section id="clientes" class="section">
+      <div class="grid grid-2">
+        <div class="card">
+          <h2>Cliente</h2>
+
+          <input type="hidden" id="clienteId" />
+
+          <div class="field">
+            <label>Nome / Empresa</label>
+            <input id="clienteNome" />
+          </div>
+
+          <div class="field">
+            <label>CPF/CNPJ</label>
+            <input id="clienteDoc" placeholder="000.000.000-00 ou 00.000.000/0000-00" />
+          </div>
+
+          <div class="field">
+            <label>Telefone / WhatsApp</label>
+            <input id="clienteFone" placeholder="5599999999999" />
+          </div>
+
+          <div class="field">
+            <label>E-mail</label>
+            <input id="clienteEmail" type="email" />
+          </div>
+
+          <div class="row">
+            <div class="field">
+              <label>Endereço</label>
+              <input id="clienteEndereco" placeholder="Rua / Avenida" />
+            </div>
+
+            <div class="field">
+              <label>Número</label>
+              <input id="clienteNumero" placeholder="Nº" />
+            </div>
+          </div>
+
+          <div class="actions">
+            <button class="btn btn-primary" type="button" onclick="salvarCliente()">
+              Salvar cliente
+            </button>
+
+            <button class="btn btn-light" type="button" onclick="limparCliente()">
+              Limpar
+            </button>
+          </div>
+        </div>
+
+        <div class="card">
+          <h2>Clientes cadastrados</h2>
+          <div id="listaClientes"></div>
+        </div>
+      </div>
+    </section>
+
+    <section id="produtos" class="section">
+      <div class="grid grid-2">
+        <div class="card">
+                    <h2>Produto/Serviço</h2>
+
+          <input type="hidden" id="produtoId" />
+
+          <div class="field">
+            <label>Descrição</label>
+            <input id="produtoDesc" />
+          </div>
+
+          <div class="row">
+            <div class="field unidade-picker-wrap">
+              <label>Unidade</label>
+
+              <select id="produtoUn" class="select-real-escondido">
+                <option value="un">un</option>
+                <option value="serviço">serviço</option>
+                <option value="hora">hora</option>
+                <option value="metro">metro</option>
+                <option value="mês">mês</option>
+              </select>
+
+              <button class="unidade-picker-btn" type="button" onclick="toggleUnidadePicker()">
+                <span id="unidadePickerTexto">Unidade</span>
+                <span class="unidade-picker-seta">▾</span>
+              </button>
+
+              <div class="unidade-picker-lista" id="unidadePickerLista"></div>
+            </div>
+
+            <div class="field">
+              <label>Valor unitário</label>
+              <input id="produtoValor" type="number" step="0.01" min="0" />
+            </div>
+          </div>
+
+          <div class="actions">
+            <button class="btn btn-primary" type="button" onclick="salvarProduto()">
+              Salvar produto/serviço
+            </button>
+
+            <button class="btn btn-light" type="button" onclick="limparProduto()">
+              Limpar
+            </button>
+          </div>
+        </div>
+
+        <div class="card">
+          <h2>Produtos/Serviços cadastrados</h2>
+          <div id="listaProdutos"></div>
+        </div>
+      </div>
+    </section>
+
+    <section id="lista" class="section">
+      <div class="card">
+        <h2>Orçamentos salvos</h2>
+        <div id="listaOrcamentos"></div>
+      </div>
+    </section>
+
+    <section id="empresa" class="section">
+      <div class="card">
+        <h2>Dados da empresa</h2>
+
+        <div class="row">
+          <div class="field">
+            <label>Razão Social</label>
+            <input id="empNome" />
+          </div>
+
+          <div class="field">
+            <label>CNPJ</label>
+            <input id="empCnpj" />
+          </div>
+        </div>
+
+        <div class="row">
+          <div class="field">
+            <label>Fone</label>
+            <input id="empFone" />
+          </div>
+
+          <div class="field">
+            <label>E-mail</label>
+            <input id="empEmail" />
+          </div>
+        </div>
+
+        <div class="field">
+          <label>Endereço completo</label>
+          <input id="empEndereco" />
+        </div>
+
+        <div class="field">
+          <label>Mensagem padrão</label>
+          <textarea id="empMsg"></textarea>
+        </div>
+
+        <div class="row">
+          <div class="field">
+            <label>Nome de quem orçou</label>
+            <input id="empResponsavel" placeholder="Ex: Guilherme de Andrade" />
+          </div>
+
+          <div class="field">
+            <label>Cargo/Função</label>
+            <input id="empCargo" placeholder="Ex: Operador de redes / Vendedor externo" />
+          </div>
+        </div>
+
+        <div class="field">
+          <label>WhatsApp para aprovação</label>
+          <input
+            id="empWhatsapp"
+            placeholder="Ex: 5599999999999"
+            oninput="this.value = formatarTelefoneDigitando(this.value)"
+          />
+        </div>
+
+        <div class="field">
+          <label>Logo da ViaTec</label>
+          <input id="empLogo" type="file" accept="image/*" onchange="carregarLogo(event)" />
+          <p class="muted">Opcional. A logo aparecerá no topo do orçamento.</p>
+        </div>
+
+        <div class="field">
+          <label>Folha timbrada de fundo</label>
+          <input id="empTimbrado" type="file" accept="image/*" onchange="carregarTimbrado(event)" />
+          <p class="muted">Opcional. Use PNG/JPG em A4 vertical.</p>
+        </div>
+
+        <div class="actions">
+          <button class="btn btn-primary" type="button" onclick="salvarEmpresa()">
+            Salvar dados da empresa
           </button>
-          <div class="cliente-picker-lista" id="clientePickerLista"></div>
-        </div>
-        <div class="row">
-          <div class="field field-modern"><label>Data</label><input id="orcData" type="date" onchange="atualizarPreview()"></div>
-          <div class="field field-modern"><label>Validade</label><input id="orcValidade" type="date" onchange="atualizarPreview()"></div>
-        </div>
-        <div class="row">
-          <div class="field field-modern status-picker-wrap">
-            <label>Status</label>
-            <select id="orcStatus" onchange="atualizarPreview()" class="select-real-escondido">
-              <option value="aberto">Aberto</option>
-              <option value="aprovado">Aprovado</option>
-              <option value="recusado">Recusado</option>
-              <option value="cancelado">Cancelado</option>
-            </select>
-            <button class="status-picker-btn" type="button" onclick="toggleStatusPicker()">
-              <span id="statusPickerTexto">Aberto</span>
-              <span class="status-picker-seta">▾</span>
-            </button>
-            <div class="status-picker-lista" id="statusPickerLista"></div>
-          </div>
-          <div class="field field-modern"><label>Desconto R$</label><input id="orcDesconto" type="number" step="0.01" min="0" value="0" oninput="atualizarPreview()" placeholder="0,00"></div>
+
+          <button class="btn btn-light" type="button" onclick="removerLogo()">
+            Remover logo
+          </button>
+
+          <button class="btn btn-light" type="button" onclick="removerTimbrado()">
+            Remover timbrado
+          </button>
         </div>
       </div>
-
-      <div class="form-section-box add-item-panel">
-        <div class="form-section-title"><span class="section-icon">＋</span><div><strong>Adicionar produtos</strong><small>Abra a lista e adicione os itens</small></div></div>
-        <div class="produto-add-list-only">
-          <div class="produto-picker-wrap produto-picker-line">
-            <label>Produto/Serviço</label>
-            <select id="produtoSelecionado" class="select-real-escondido"></select>
-            <input id="itemQtd" type="hidden" value="1">
-            <button class="produto-picker-btn" type="button" onclick="toggleProdutoPicker()">
-              <span id="produtoPickerTexto">Selecione o produto/serviço</span>
-              <span class="produto-picker-seta">▾</span>
-            </button>
-            <div class="produto-picker-lista" id="produtoPickerLista"></div>
-          </div>
-        </div>
-
-        <button class="btn btn-light manual-btn" type="button" onclick="adicionarManual()">+ Adicionar item manual</button>
-      </div>
-
-      <div class="form-section-box">
-        <div class="form-section-title"><span class="section-icon">🧾</span><div><strong>Itens do orçamento</strong><small>Edite quantidade, valor e subtotal</small></div></div>
-        <div id="itensTela"></div>
-      </div>
-
-      <div class="form-section-box">
-        <div class="form-section-title"><span class="section-icon">💳</span><div><strong>Pagamento e observações</strong><small>Informe condições e detalhes finais</small></div></div>
-        <div class="field field-modern"><label>Descrição de pagamento</label><textarea id="orcPagamento" placeholder="Ex: 50% de entrada via Pix e restante na conclusão." oninput="atualizarPreview()"></textarea></div>
-        <div class="field field-modern"><label>Observações</label><textarea id="orcObs" oninput="atualizarPreview()" placeholder="Observações do orçamento..."></textarea></div>
-      </div>
-
-      <div class="actions form-final-actions"><button class="btn btn-primary" type="button" onclick="salvarOrcamento()">Salvar orçamento</button><button class="btn btn-light" type="button" onclick="limparOrcamento()">Novo/Limpar</button></div>
-    </div><div class="card"><div class="preview-bar no-print"><h2 style="margin:0">Pré-visualização</h2><div class="actions" style="margin:0"><button class="btn btn-light" type="button" onclick="window.print()">Imprimir</button><button class="btn btn-success" type="button" onclick="baixarPDF()">Baixar PDF</button><button class="btn btn-success" type="button" onclick="enviarWhatsApp()">WhatsApp</button></div></div><div id="previewOrcamento"></div></div></div></section>
-    <section id="clientes" class="section"><div class="grid grid-2"><div class="card"><h2>Cliente</h2><input type="hidden" id="clienteId"><div class="field"><label>Nome / Empresa</label><input id="clienteNome"></div><div class="field"><label>CPF/CNPJ</label><input id="clienteDoc" placeholder="000.000.000-00 ou 00.000.000/0000-00"></div><div class="field"><label>Telefone / WhatsApp</label><input id="clienteFone" placeholder="5599999999999"></div><div class="field"><label>E-mail</label><input id="clienteEmail" type="email"></div><div class="row"><div class="field"><label>Endereço</label><input id="clienteEndereco" placeholder="Rua / Avenida"></div><div class="field"><label>Número</label><input id="clienteNumero" placeholder="Nº"></div></div><div class="actions"><button class="btn btn-primary" type="button" onclick="salvarCliente()">Salvar cliente</button><button class="btn btn-light" type="button" onclick="limparCliente()">Limpar</button></div></div><div class="card"><h2>Clientes cadastrados</h2><div id="listaClientes"></div></div></div></section>
-    <section id="produtos" class="section"><div class="grid grid-2"><div class="card"><h2>Produto/Serviço</h2><input type="hidden" id="produtoId"><div class="field"><label>Descrição</label><input id="produtoDesc"></div><div class="row"><div class="field unidade-picker-wrap">
-  <label>Unidade</label>
-  <select id="produtoUn" class="select-real-escondido">
-    <option value="un">un</option>
-    <option value="serviço">serviço</option>
-    <option value="hora">hora</option>
-    <option value="metro">metro</option>
-    <option value="mês">mês</option>
-  </select>
-  <button class="unidade-picker-btn" type="button" onclick="toggleUnidadePicker()">
-    <span id="unidadePickerTexto">un</span>
-    <span class="unidade-picker-seta">▾</span>
-  </button>
-  <div class="unidade-picker-lista" id="unidadePickerLista"></div>
-</div><div class="field"><label>Valor unitário</label><input id="produtoValor" type="number" step="0.01" min="0"></div></div><div class="actions"><button class="btn btn-primary" type="button" onclick="salvarProduto()">Salvar produto/serviço</button><button class="btn btn-light" type="button" onclick="limparProduto()">Limpar</button></div></div><div class="card"><h2>Produtos/Serviços cadastrados</h2><div id="listaProdutos"></div></div></div></section>
-    <section id="lista" class="section"><div class="card"><h2>Orçamentos salvos</h2><div id="listaOrcamentos"></div></div></section>
-    <section id="empresa" class="section"><div class="card"><h2>Dados da empresa</h2><div class="row"><div class="field"><label>Razão Social</label><input id="empNome"></div><div class="field"><label>CNPJ</label><input id="empCnpj"></div></div><div class="row"><div class="field"><label>Fone</label><input id="empFone"></div><div class="field"><label>E-mail</label><input id="empEmail"></div></div><div class="field"><label>Endereço completo</label><input id="empEndereco"></div><div class="field"><label>Mensagem padrão</label><textarea id="empMsg"></textarea></div><div class="row"><div class="field"><label>Nome de quem orçou</label><input id="empResponsavel" placeholder="Ex: Guilherme de Andrade"></div><div class="field"><label>Cargo/Função</label><input id="empCargo" placeholder="Ex: Operador de redes / Vendedor externo"></div></div><div class="field"><label>WhatsApp para aprovação</label><input id="empWhatsapp" placeholder="Ex: 5599999999999" oninput="this.value=formatarTelefoneDigitando(this.value)"></div><div class="field"><label>Logo da ViaTec</label><input id="empLogo" type="file" accept="image/*" onchange="carregarLogo(event)"><p class="muted">Opcional. A logo aparecerá no topo do orçamento.</p></div><div class="field"><label>Folha timbrada de fundo</label><input id="empTimbrado" type="file" accept="image/*" onchange="carregarTimbrado(event)"><p class="muted">Opcional. Use PNG/JPG em A4 vertical.</p></div><div class="actions"><button class="btn btn-primary" type="button" onclick="salvarEmpresa()">Salvar dados da empresa</button><button class="btn btn-light" type="button" onclick="removerLogo()">Remover logo</button><button class="btn btn-light" type="button" onclick="removerTimbrado()">Remover timbrado</button></div></div></section>
+    </section>
   </main>
+
   <script>
-    const $=id=>document.getElementById(id);const dinheiro=new Intl.NumberFormat('pt-BR',{style:'currency',currency:'BRL'});let clientes=[],produtos=[],orcamentos=[],itensOrcamento=[],orcamentoEditandoId=null;
-    let empresa={nome:'VIATEC TELECOMUNICAÇÕES LTDA',cnpj:'10.356.869/0001-27',fone:'55-3528-1032',email:'',endereco:'AV BENTO GONÇALVES, 890 - CENTRO, CAMPO NOVO - RS, CEP 98570-000',mensagem:'Obrigado por solicitar um orçamento com a ViaTec. Ficamos à disposição para qualquer dúvida.',timbrado:'',logo:'empLogo.png',responsavel:'',cargo:'',whatsapp:'555535281032'};
-    function uid(){return Date.now().toString(36)+Math.random().toString(36).slice(2)}function hojeISO(){return new Date().toISOString().slice(0,10)}function addDias(data,dias){const d=new Date(data+'T00:00:00');d.setDate(d.getDate()+dias);return d.toISOString().slice(0,10)}function dataBR(data){if(!data)return'';const p=String(data).split('-');return p.length===3?p[2]+'/'+p[1]+'/'+p[0]:data}function somenteNumeros(v){return String(v||'').replace(/\D/g,'')}
-    function formatarDocumento(doc){const n=somenteNumeros(doc);if(n.length===11)return n.slice(0,3)+'.'+n.slice(3,6)+'.'+n.slice(6,9)+'-'+n.slice(9,11);if(n.length===14)return n.slice(0,2)+'.'+n.slice(2,5)+'.'+n.slice(5,8)+'/'+n.slice(8,12)+'-'+n.slice(12,14);return doc||''}function formatarTelefone(fone){const n=somenteNumeros(fone);if(n.length===11)return'('+n.slice(0,2)+') '+n.slice(2,7)+'-'+n.slice(7,11);if(n.length===10)return'('+n.slice(0,2)+') '+n.slice(2,6)+'-'+n.slice(6,10);if(n.length===12&&n.slice(0,2)==='55')return'('+n.slice(2,4)+') '+n.slice(4,8)+'-'+n.slice(8,12);if(n.length===13&&n.slice(0,2)==='55')return'('+n.slice(2,4)+') '+n.slice(4,9)+'-'+n.slice(9,13);return fone||''}function formatarTelefoneDigitando(fone){const n=somenteNumeros(fone).slice(0,13);if(n.length<=2)return n;if(n.length<=6)return'('+n.slice(0,2)+') '+n.slice(2);if(n.length<=10)return'('+n.slice(0,2)+') '+n.slice(2,6)+'-'+n.slice(6);if(n.length===11)return'('+n.slice(0,2)+') '+n.slice(2,7)+'-'+n.slice(7);if(n.length===12&&n.slice(0,2)==='55')return'('+n.slice(2,4)+') '+n.slice(4,8)+'-'+n.slice(8);if(n.length===13&&n.slice(0,2)==='55')return'('+n.slice(2,4)+') '+n.slice(4,9)+'-'+n.slice(9);return n}
-    function enderecoCompletoCliente(c){if(!c)return'';return(c.endereco||'')+(c.numero?', Nº '+c.numero:'')}function salvarTudo(){localStorage.setItem('vt_clientes',JSON.stringify(clientes));localStorage.setItem('vt_produtos',JSON.stringify(produtos));localStorage.setItem('vt_orcamentos',JSON.stringify(orcamentos));localStorage.setItem('vt_empresa',JSON.stringify(empresa))}function carregarTudo(){clientes=JSON.parse(localStorage.getItem('vt_clientes')||'[]');produtos=JSON.parse(localStorage.getItem('vt_produtos')||'[]');orcamentos=JSON.parse(localStorage.getItem('vt_orcamentos')||'[]');const empSalva=JSON.parse(localStorage.getItem('vt_empresa')||'null');if(empSalva)empresa={...empresa,...empSalva};if(!empresa.logo)empresa.logo='empLogo.png';if(!empresa.whatsapp)empresa.whatsapp='555535281032'}
-    function abrirAba(id,botao){document.querySelectorAll('.section').forEach(sec=>sec.classList.remove('active'));$(id).classList.add('active');document.querySelectorAll('.tabs button').forEach(btn=>btn.classList.remove('active'));if(botao)botao.classList.add('active');if(id==='orcamento')atualizarPreview()}function proximoNumero(){return new Date().getFullYear()+'-'+String(orcamentos.length+1).padStart(4,'0')}function clienteAtual(){return clientes.find(c=>c.id===$('orcCliente').value)||null}function totais(){const subtotal=itensOrcamento.reduce((s,i)=>s+Number(i.subtotal||0),0);const desconto=Number($('orcDesconto').value||0);return{subtotal,desconto,total:Math.max(0,subtotal-desconto)}}
-    function renderSelects(){
-      $('orcCliente').innerHTML='<option value="">Selecione o cliente</option>'+clientes.map(c=>`<option value="${c.id}">${c.nome}</option>`).join('');
-      $('produtoSelecionado').innerHTML='<option value="">Selecione o produto/serviço</option>'+produtos.map(p=>`<option value="${p.id}">${p.descricao} — ${dinheiro.format(Number(p.valor||0))}</option>`).join('');
+    const $ = (id) => document.getElementById(id);
+
+    const dinheiro = new Intl.NumberFormat("pt-BR", {
+      style: "currency",
+      currency: "BRL"
+    });
+
+    let clientes = [];
+    let produtos = [];
+    let orcamentos = [];
+    let itensOrcamento = [];
+    let orcamentoEditandoId = null;
+
+    let empresa = {
+      nome: "VIATEC TELECOMUNICAÇÕES LTDA",
+      cnpj: "10.356.869/0001-27",
+      fone: "55-3528-1032",
+      email: "",
+      endereco: "AV BENTO GONÇALVES, 890 - CENTRO, CAMPO NOVO - RS, CEP 98570-000",
+      mensagem: "Obrigado por solicitar um orçamento com a ViaTec. Ficamos à disposição para qualquer dúvida.",
+      timbrado: "",
+      logo: "empLogo.png",
+      responsavel: "",
+      cargo: "",
+      whatsapp: "555535281032"
+    };
+
+    function uid() {
+      return Date.now().toString(36) + Math.random().toString(36).slice(2);
+    }
+
+    function hojeISO() {
+      return new Date().toISOString().slice(0, 10);
+    }
+
+    function addDias(data, dias) {
+      const d = new Date(data + "T00:00:00");
+      d.setDate(d.getDate() + dias);
+      return d.toISOString().slice(0, 10);
+    }
+
+    function dataBR(data) {
+      if (!data) return "";
+
+      const p = String(data).split("-");
+
+      return p.length === 3 ? p[2] + "/" + p[1] + "/" + p[0] : data;
+    }
+
+    function somenteNumeros(v) {
+      return String(v || "").replace(/\D/g, "");
+    }
+
+    function formatarDocumento(doc) {
+      const n = somenteNumeros(doc);
+
+      if (n.length === 11) {
+        return n.slice(0, 3) + "." + n.slice(3, 6) + "." + n.slice(6, 9) + "-" + n.slice(9, 11);
+      }
+
+      if (n.length === 14) {
+        return n.slice(0, 2) + "." + n.slice(2, 5) + "." + n.slice(5, 8) + "/" + n.slice(8, 12) + "-" + n.slice(12, 14);
+      }
+
+      return doc || "";
+    }
+
+    function formatarTelefone(fone) {
+      const n = somenteNumeros(fone);
+
+      if (n.length === 11) {
+        return "(" + n.slice(0, 2) + ") " + n.slice(2, 7) + "-" + n.slice(7, 11);
+      }
+
+      if (n.length === 10) {
+        return "(" + n.slice(0, 2) + ") " + n.slice(2, 6) + "-" + n.slice(6, 10);
+      }
+
+      if (n.length === 12 && n.slice(0, 2) === "55") {
+        return "(" + n.slice(2, 4) + ") " + n.slice(4, 8) + "-" + n.slice(8, 12);
+      }
+
+      if (n.length === 13 && n.slice(0, 2) === "55") {
+        return "(" + n.slice(2, 4) + ") " + n.slice(4, 9) + "-" + n.slice(9, 13);
+      }
+
+      return fone || "";
+    }
+
+    function formatarTelefoneDigitando(fone) {
+      const n = somenteNumeros(fone).slice(0, 13);
+
+      if (n.length <= 2) return n;
+      if (n.length <= 6) return "(" + n.slice(0, 2) + ") " + n.slice(2);
+      if (n.length <= 10) return "(" + n.slice(0, 2) + ") " + n.slice(2, 6) + "-" + n.slice(6);
+      if (n.length === 11) return "(" + n.slice(0, 2) + ") " + n.slice(2, 7) + "-" + n.slice(7);
+
+      if (n.length === 12 && n.slice(0, 2) === "55") {
+        return "(" + n.slice(2, 4) + ") " + n.slice(4, 8) + "-" + n.slice(8);
+      }
+
+      if (n.length === 13 && n.slice(0, 2) === "55") {
+        return "(" + n.slice(2, 4) + ") " + n.slice(4, 9) + "-" + n.slice(9);
+      }
+
+      return n;
+    }
+
+    function enderecoCompletoCliente(cliente) {
+      if (!cliente) return "";
+
+      return (cliente.endereco || "") + (cliente.numero ? ", Nº " + cliente.numero : "");
+    }
+
+    function salvarTudo() {
+      localStorage.setItem("vt_clientes", JSON.stringify(clientes));
+      localStorage.setItem("vt_produtos", JSON.stringify(produtos));
+      localStorage.setItem("vt_orcamentos", JSON.stringify(orcamentos));
+      localStorage.setItem("vt_empresa", JSON.stringify(empresa));
+    }
+
+    function carregarTudo() {
+      clientes = JSON.parse(localStorage.getItem("vt_clientes") || "[]");
+      produtos = JSON.parse(localStorage.getItem("vt_produtos") || "[]");
+      orcamentos = JSON.parse(localStorage.getItem("vt_orcamentos") || "[]");
+
+      const empSalva = JSON.parse(localStorage.getItem("vt_empresa") || "null");
+
+      if (empSalva) {
+        empresa = { ...empresa, ...empSalva };
+      }
+
+      if (!empresa.logo) empresa.logo = "empLogo.png";
+      if (!empresa.whatsapp) empresa.whatsapp = "555535281032";
+    }
+
+    function abrirAba(id, botao) {
+      document.querySelectorAll(".section").forEach((sec) => sec.classList.remove("active"));
+
+      $(id).classList.add("active");
+
+      document.querySelectorAll(".tabs button").forEach((btn) => btn.classList.remove("active"));
+
+      if (botao) {
+        botao.classList.add("active");
+      }
+
+      if (id === "orcamento") {
+        atualizarPreview();
+      }
+    }
+
+    function proximoNumero() {
+      return new Date().getFullYear() + "-" + String(orcamentos.length + 1).padStart(4, "0");
+    }
+
+    function clienteAtual() {
+      return clientes.find((c) => c.id === $("orcCliente").value) || null;
+    }
+
+    function totais() {
+      const subtotal = itensOrcamento.reduce((s, i) => s + Number(i.subtotal || 0), 0);
+      const desconto = Number($("orcDesconto").value || 0);
+      const total = Math.max(0, subtotal - desconto);
+
+      return {
+        subtotal,
+        desconto,
+        total
+      };
+    }
+        function renderSelects() {
+      $("orcCliente").innerHTML =
+        '<option value="">Selecione o cliente</option>' +
+        clientes.map((c) => `<option value="${c.id}">${c.nome}</option>`).join("");
+
+      $("produtoSelecionado").innerHTML =
+        '<option value="">Selecione o produto/serviço</option>' +
+        produtos.map((p) => `<option value="${p.id}">${p.descricao} — ${dinheiro.format(Number(p.valor || 0))}</option>`).join("");
+
       renderClientePicker();
       renderProdutoPicker();
       renderUnidadePicker();
       renderStatusPicker();
     }
 
-    function renderStatusPicker(){
-      const lista=$('statusPickerLista');
-      const texto=$('statusPickerTexto');
-      const select=$('orcStatus');
-      if(!lista||!texto||!select)return;
+    function renderStatusPicker() {
+      const lista = $("statusPickerLista");
+      const texto = $("statusPickerTexto");
+      const select = $("orcStatus");
 
-      const statusOpcoes=[
-        {valor:'aberto', titulo:'Aberto', desc:'Orçamento em negociação', classe:'aberto'},
-        {valor:'aprovado', titulo:'Aprovado', desc:'Cliente aprovou o orçamento', classe:'aprovado'},
-        {valor:'recusado', titulo:'Recusado', desc:'Cliente não aprovou', classe:'recusado'},
-        {valor:'cancelado', titulo:'Cancelado', desc:'Orçamento cancelado', classe:'cancelado'}
+      if (!lista || !texto || !select) return;
+
+      const statusOpcoes = [
+        {
+          valor: "aberto",
+          titulo: "Aberto",
+          desc: "Orçamento em negociação",
+          classe: "aberto"
+        },
+        {
+          valor: "aprovado",
+          titulo: "Aprovado",
+          desc: "Cliente aprovou o orçamento",
+          classe: "aprovado"
+        },
+        {
+          valor: "recusado",
+          titulo: "Recusado",
+          desc: "Cliente não aprovou",
+          classe: "recusado"
+        },
+        {
+          valor: "cancelado",
+          titulo: "Cancelado",
+          desc: "Orçamento cancelado",
+          classe: "cancelado"
+        }
       ];
 
-      const atual=statusOpcoes.find(s=>s.valor===select.value)||statusOpcoes[0];
-      texto.innerHTML='<span class="status-dot '+atual.classe+'"></span>'+atual.titulo;
+      const atual = statusOpcoes.find((s) => s.valor === select.value) || statusOpcoes[0];
 
-      lista.innerHTML=statusOpcoes.map(s=>`
-        <button type="button" class="status-picker-opcao ${s.valor===select.value?'active':''}" onclick="selecionarStatusPicker('${s.valor}')">
-          <span class="status-dot ${s.classe}"></span>
-          <span><strong>${s.titulo}</strong><small>${s.desc}</small></span>
-        </button>
-      `).join('');
+      texto.innerHTML = '<span class="status-dot ' + atual.classe + '"></span>' + atual.titulo;
+
+      lista.innerHTML = statusOpcoes
+        .map(
+          (s) => `
+            <button type="button" class="status-picker-opcao ${s.valor === select.value ? "active" : ""}" onclick="selecionarStatusPicker('${s.valor}')">
+              <span class="status-dot ${s.classe}"></span>
+              <span>
+                <strong>${s.titulo}</strong>
+                <small>${s.desc}</small>
+              </span>
+            </button>
+          `
+        )
+        .join("");
     }
 
-    function toggleStatusPicker(){
-      const lista=$('statusPickerLista');
-      if(!lista)return;
-      lista.classList.toggle('open');
+    function toggleStatusPicker() {
+      const lista = $("statusPickerLista");
+
+      if (!lista) return;
+
+      lista.classList.toggle("open");
     }
 
-    function selecionarStatusPicker(valor){
-      const select=$('orcStatus');
-      if(!select)return;
-      select.value=valor;
-      const lista=$('statusPickerLista');
-      if(lista)lista.classList.remove('open');
+    function selecionarStatusPicker(valor) {
+      const select = $("orcStatus");
+
+      if (!select) return;
+
+      select.value = valor;
+
+      const lista = $("statusPickerLista");
+
+      if (lista) {
+        lista.classList.remove("open");
+      }
+
       renderStatusPicker();
       atualizarPreview();
     }
 
-    function renderUnidadePicker(){
-      const lista=$('unidadePickerLista');
-      const texto=$('unidadePickerTexto');
-      const select=$('produtoUn');
-      if(!lista||!texto||!select)return;
+    function renderUnidadePicker() {
+      const lista = $("unidadePickerLista");
+      const texto = $("unidadePickerTexto");
+      const select = $("produtoUn");
 
-      const unidades=[
-        {valor:'un', titulo:'Unidade', desc:'Produto por unidade'},
-        {valor:'serviço', titulo:'Serviço', desc:'Serviço fechado'},
-        {valor:'hora', titulo:'Hora', desc:'Cobrança por hora'},
-        {valor:'metro', titulo:'Metro', desc:'Cobrança por metro'},
-        {valor:'mês', titulo:'Mês', desc:'Cobrança mensal'}
+      if (!lista || !texto || !select) return;
+
+      const unidades = [
+        {
+          valor: "un",
+          titulo: "Unidade",
+          desc: "Produto por unidade"
+        },
+        {
+          valor: "serviço",
+          titulo: "Serviço",
+          desc: "Serviço fechado"
+        },
+        {
+          valor: "hora",
+          titulo: "Hora",
+          desc: "Cobrança por hora"
+        },
+        {
+          valor: "metro",
+          titulo: "Metro",
+          desc: "Cobrança por metro"
+        },
+        {
+          valor: "mês",
+          titulo: "Mês",
+          desc: "Cobrança mensal"
+        }
       ];
 
-      const atual=unidades.find(u=>u.valor===select.value)||unidades[0];
-      texto.textContent=atual.titulo;
+      const atual = unidades.find((u) => u.valor === select.value) || unidades[0];
 
-      lista.innerHTML=unidades.map(u=>`
-        <button type="button" class="unidade-picker-opcao ${u.valor===select.value?'active':''}" onclick="selecionarUnidadePicker('${u.valor}')">
-          <strong>${u.titulo}</strong>
-          <span>${u.desc}</span>
-        </button>
-      `).join('');
+      texto.textContent = atual.titulo;
+
+      lista.innerHTML = unidades
+        .map(
+          (u) => `
+            <button type="button" class="unidade-picker-opcao ${u.valor === select.value ? "active" : ""}" onclick="selecionarUnidadePicker('${u.valor}')">
+              <strong>${u.titulo}</strong>
+              <span>${u.desc}</span>
+            </button>
+          `
+        )
+        .join("");
     }
 
-    function toggleUnidadePicker(){
-      const lista=$('unidadePickerLista');
-      if(!lista)return;
-      lista.classList.toggle('open');
+    function toggleUnidadePicker() {
+      const lista = $("unidadePickerLista");
+
+      if (!lista) return;
+
+      lista.classList.toggle("open");
     }
 
-    function selecionarUnidadePicker(valor){
-      const select=$('produtoUn');
-      if(!select)return;
-      select.value=valor;
-      const lista=$('unidadePickerLista');
-      if(lista)lista.classList.remove('open');
+    function selecionarUnidadePicker(valor) {
+      const select = $("produtoUn");
+
+      if (!select) return;
+
+      select.value = valor;
+
+      const lista = $("unidadePickerLista");
+
+      if (lista) {
+        lista.classList.remove("open");
+      }
+
       renderUnidadePicker();
     }
 
-    function renderClientePicker(){
-      const lista=$('clientePickerLista');
-      const texto=$('clientePickerTexto');
-      if(!lista||!texto||!$('orcCliente'))return;
-      const selecionado=clientes.find(c=>c.id===$('orcCliente').value);
-      texto.textContent=selecionado?selecionado.nome:'Selecione o cliente';
-      if(!clientes.length){
-        lista.innerHTML='<div class="cliente-picker-vazio">Nenhum cliente cadastrado</div>';
+    function renderClientePicker() {
+      const lista = $("clientePickerLista");
+      const texto = $("clientePickerTexto");
+
+      if (!lista || !texto || !$("orcCliente")) return;
+
+      const selecionado = clientes.find((c) => c.id === $("orcCliente").value);
+
+      texto.textContent = selecionado ? selecionado.nome : "Selecione o cliente";
+
+      if (!clientes.length) {
+        lista.innerHTML = '<div class="cliente-picker-vazio">Nenhum cliente cadastrado</div>';
         return;
       }
-      lista.innerHTML=clientes.map(c=>`<button type="button" class="cliente-picker-opcao" onclick="selecionarClientePicker('${c.id}')"><strong>${c.nome}</strong><span>${formatarDocumento(c.documento)||'Sem CPF/CNPJ cadastrado'}</span></button>`).join('');
+
+      lista.innerHTML = clientes
+        .map(
+          (c) => `
+            <button type="button" class="cliente-picker-opcao" onclick="selecionarClientePicker('${c.id}')">
+              <strong>${c.nome}</strong>
+              <span>${formatarDocumento(c.documento) || "Sem CPF/CNPJ cadastrado"}</span>
+            </button>
+          `
+        )
+        .join("");
     }
 
-    function toggleClientePicker(){
-      const lista=$('clientePickerLista');
-      if(!lista)return;
-      lista.classList.toggle('open');
+    function toggleClientePicker() {
+      const lista = $("clientePickerLista");
+
+      if (!lista) return;
+
+      lista.classList.toggle("open");
     }
 
-    function selecionarClientePicker(id){
-      $('orcCliente').value=id;
-      const lista=$('clientePickerLista');
-      if(lista)lista.classList.remove('open');
+    function selecionarClientePicker(id) {
+      $("orcCliente").value = id;
+
+      const lista = $("clientePickerLista");
+
+      if (lista) {
+        lista.classList.remove("open");
+      }
+
       renderClientePicker();
       atualizarPreview();
     }
 
-    function renderProdutoPicker(){
-      const lista = $('produtoPickerLista');
-      const texto = $('produtoPickerTexto');
-      const select = $('produtoSelecionado');
+    function renderProdutoPicker() {
+      const lista = $("produtoPickerLista");
+      const texto = $("produtoPickerTexto");
+      const select = $("produtoSelecionado");
 
       if (!lista || !texto || !select) return;
 
-      const selecionado = produtos.find(p => p.id === select.value);
-      texto.textContent = selecionado ? selecionado.descricao : 'Selecione o produto/serviço';
+      const selecionado = produtos.find((p) => p.id === select.value);
+
+      texto.textContent = selecionado ? selecionado.descricao : "Selecione o produto/serviço";
 
       if (!produtos.length) {
         lista.innerHTML = '<div class="produto-picker-vazio">Nenhum produto/serviço cadastrado</div>';
         return;
       }
 
-      lista.innerHTML = produtos.map(p => `
-        <div class="produto-opcao-add produto-opcao-simples">
-          <button type="button" class="produto-opcao-info" onclick="selecionarProdutoPicker('${p.id}')">
-            <strong>${p.descricao}</strong>
-            <span>${p.unidade || 'un'} • ${dinheiro.format(Number(p.valor || 0))}</span>
-          </button>
-          <button type="button" class="produto-opcao-add-btn produto-add-lateral" onclick="adicionarProdutoDaLista('${p.id}')" title="Adicionar ao orçamento">+</button>
-        </div>
-      `).join('');
+      lista.innerHTML = produtos
+        .map(
+          (p) => `
+            <div class="produto-opcao-simples">
+              <button type="button" class="produto-opcao-info" onclick="selecionarProdutoPicker('${p.id}')">
+                <strong>${p.descricao}</strong>
+                <span>${p.unidade || "un"} • ${dinheiro.format(Number(p.valor || 0))}</span>
+              </button>
+
+              <button type="button" class="produto-add-lateral" onclick="adicionarProdutoDaLista('${p.id}')" title="Adicionar ao orçamento">
+                +
+              </button>
+            </div>
+          `
+        )
+        .join("");
     }
 
-    function toggleProdutoPicker(){
-      const lista = $('produtoPickerLista');
+    function toggleProdutoPicker() {
+      const lista = $("produtoPickerLista");
+
       if (!lista) return;
-      lista.classList.toggle('open');
+
+      lista.classList.toggle("open");
     }
 
-    function selecionarProdutoPicker(id){
-      const select = $('produtoSelecionado');
+    function selecionarProdutoPicker(id) {
+      const select = $("produtoSelecionado");
+
       if (!select) return;
+
       select.value = id;
       renderProdutoPicker();
     }
 
-    function aumentarQtdProdutoLista(id){
-      const campo = $('qtd_prod_' + id);
-      if (!campo) return;
-      const valor = parseInt(campo.value || '1', 10);
-      campo.value = (!Number.isInteger(valor) || valor < 1) ? 1 : valor + 1;
-    }
-
-    function diminuirQtdProdutoLista(id){
-      const campo = $('qtd_prod_' + id);
-      if (!campo) return;
-      const valor = parseInt(campo.value || '1', 10);
-      campo.value = (!Number.isInteger(valor) || valor <= 1) ? 1 : valor - 1;
-    }
-
-    function adicionarProdutoDaLista(id){
-      const produto = produtos.find(p => p.id === id);
+    function adicionarProdutoDaLista(id) {
+      const produto = produtos.find((p) => p.id === id);
       const qtd = 1;
 
-      if (!produto) return alert('Produto não encontrado.');
+      if (!produto) {
+        return alert("Produto não encontrado.");
+      }
 
       itensOrcamento.push({
         id: uid(),
@@ -3237,109 +2442,819 @@
       atualizarPreview();
       renderProdutoPicker();
 
-      const lista = $('produtoPickerLista');
-      if (lista) lista.classList.add('open');
+      const lista = $("produtoPickerLista");
+
+      if (lista) {
+        lista.classList.add("open");
+      }
     }
 
-    function diminuirQtdProduto(){
-      const campo=$('itemQtd');
-      if(!campo)return;
-      const valor=parseInt(campo.value||'1',10);
-      campo.value=(!Number.isInteger(valor)||valor<=1)?1:valor-1;
-    }
+    document.addEventListener("click", function (event) {
+      const wrapCliente = document.querySelector(".cliente-picker-wrap");
+      const listaCliente = $("clientePickerLista");
 
-    document.addEventListener('click',function(event){
-      const wrap=document.querySelector('.cliente-picker-wrap');
-      const lista=$('clientePickerLista');
-      if(wrap&&lista&&!wrap.contains(event.target))lista.classList.remove('open');
-      const wrapProduto=document.querySelector('.produto-picker-wrap');
-      const listaProduto=$('produtoPickerLista');
-      if(wrapProduto&&listaProduto&&!wrapProduto.contains(event.target))listaProduto.classList.remove('open');
-      const wrapUnidade=document.querySelector('.unidade-picker-wrap');
-      const listaUnidade=$('unidadePickerLista');
-      if(wrapUnidade&&listaUnidade&&!wrapUnidade.contains(event.target))listaUnidade.classList.remove('open');
-      const wrapStatus=document.querySelector('.status-picker-wrap');
-      const listaStatus=$('statusPickerLista');
-      if(wrapStatus&&listaStatus&&!wrapStatus.contains(event.target))listaStatus.classList.remove('open');
+      if (wrapCliente && listaCliente && !wrapCliente.contains(event.target)) {
+        listaCliente.classList.remove("open");
+      }
+
+      const wrapProduto = document.querySelector(".produto-picker-wrap");
+      const listaProduto = $("produtoPickerLista");
+
+      if (wrapProduto && listaProduto && !wrapProduto.contains(event.target)) {
+        listaProduto.classList.remove("open");
+      }
+
+      const wrapUnidade = document.querySelector(".unidade-picker-wrap");
+      const listaUnidade = $("unidadePickerLista");
+
+      if (wrapUnidade && listaUnidade && !wrapUnidade.contains(event.target)) {
+        listaUnidade.classList.remove("open");
+      }
+
+      const wrapStatus = document.querySelector(".status-picker-wrap");
+      const listaStatus = $("statusPickerLista");
+
+      if (wrapStatus && listaStatus && !wrapStatus.contains(event.target)) {
+        listaStatus.classList.remove("open");
+      }
     });
-    function salvarCliente(){const nome=$('clienteNome').value.trim();if(!nome)return alert('Informe o nome do cliente.');const id=$('clienteId').value||uid();const registro={id,nome,documento:$('clienteDoc').value.trim(),telefone:$('clienteFone').value.trim(),email:$('clienteEmail').value.trim(),endereco:$('clienteEndereco').value.trim(),numero:$('clienteNumero').value.trim()};const pos=clientes.findIndex(c=>c.id===id);if(pos>=0)clientes[pos]=registro;else clientes.unshift(registro);salvarTudo();limparCliente();atualizarTela();alert('Cliente salvo.')}function editarCliente(id){const c=clientes.find(x=>x.id===id);if(!c)return;$('clienteId').value=c.id;$('clienteNome').value=c.nome||'';$('clienteDoc').value=c.documento||'';$('clienteFone').value=c.telefone||'';$('clienteEmail').value=c.email||'';$('clienteEndereco').value=c.endereco||'';$('clienteNumero').value=c.numero||'';abrirAba('clientes',document.querySelectorAll('.tabs button')[1])}function excluirCliente(id){if(!confirm('Excluir cliente?'))return;clientes=clientes.filter(c=>c.id!==id);salvarTudo();atualizarTela()}function limparCliente(){$('clienteId').value='';$('clienteNome').value='';$('clienteDoc').value='';$('clienteFone').value='';$('clienteEmail').value='';$('clienteEndereco').value='';$('clienteNumero').value=''}function renderClientes(){if(!clientes.length){$('listaClientes').innerHTML='<div class="empty-box">Nenhum cliente cadastrado.</div>';return}$('listaClientes').innerHTML=`<table class="responsive"><thead><tr><th>Cliente</th><th>Telefone</th><th>Ações</th></tr></thead><tbody>${clientes.map(c=>`<tr><td data-label="Cliente"><strong>${c.nome}</strong><br><span class="muted">${formatarDocumento(c.documento)}</span></td><td data-label="Telefone">${formatarTelefone(c.telefone)}</td><td data-label="Ações"><button class="btn btn-light" type="button" onclick="editarCliente('${c.id}')">Editar</button> <button class="btn btn-danger" type="button" onclick="excluirCliente('${c.id}')">Excluir</button></td></tr>`).join('')}</tbody></table>`}
-    function salvarProduto(){const descricao=$('produtoDesc').value.trim();if(!descricao)return alert('Informe a descrição do produto/serviço.');const id=$('produtoId').value||uid();const registro={id,descricao,unidade:$('produtoUn').value,valor:Number($('produtoValor').value||0)};const pos=produtos.findIndex(p=>p.id===id);if(pos>=0)produtos[pos]=registro;else produtos.unshift(registro);salvarTudo();limparProduto();atualizarTela();alert('Produto/serviço salvo.')}function editarProduto(id){const p=produtos.find(x=>x.id===id);if(!p)return;$('produtoId').value=p.id;$('produtoDesc').value=p.descricao||'';$('produtoUn').value=p.unidade||'un';renderUnidadePicker();$('produtoValor').value=p.valor||0;abrirAba('produtos',document.querySelectorAll('.tabs button')[2])}function excluirProduto(id){if(!confirm('Excluir produto/serviço?'))return;produtos=produtos.filter(p=>p.id!==id);salvarTudo();atualizarTela()}function limparProduto(){$('produtoId').value='';$('produtoDesc').value='';$('produtoUn').value='un';$('produtoValor').value='';renderUnidadePicker()}function renderProdutos(){if(!produtos.length){$('listaProdutos').innerHTML='<div class="empty-box">Nenhum produto/serviço cadastrado.</div>';return}$('listaProdutos').innerHTML=`<table class="responsive"><thead><tr><th>Descrição</th><th>Un.</th><th>Valor</th><th>Ações</th></tr></thead><tbody>${produtos.map(p=>`<tr><td data-label="Descrição"><strong>${p.descricao}</strong></td><td data-label="Un.">${p.unidade}</td><td data-label="Valor" class="money">${dinheiro.format(Number(p.valor||0))}</td><td data-label="Ações"><button class="btn btn-light" type="button" onclick="editarProduto('${p.id}')">Editar</button> <button class="btn btn-danger" type="button" onclick="excluirProduto('${p.id}')">Excluir</button></td></tr>`).join('')}</tbody></table>`}
-    function adicionarProduto(){const id=$('produtoSelecionado').value;const qtd=parseInt($('itemQtd').value||'1',10);const p=produtos.find(x=>x.id===id);if(!p)return alert('Selecione um produto/serviço.');if(!Number.isInteger(qtd)||qtd<1)return alert('Informe uma quantidade inteira: 1, 2, 3...');itensOrcamento.push({id:uid(),descricao:p.descricao,unidade:p.unidade,quantidade:qtd,valor:Number(p.valor||0),subtotal:qtd*Number(p.valor||0)});$('produtoSelecionado').value='';$('itemQtd').value=1;renderProdutoPicker();renderItens();atualizarPreview()}function adicionarManual(){const descricao=prompt('Descrição do item:');if(!descricao)return;const qtd=parseInt(prompt('Quantidade:','1')||'1',10);if(!Number.isInteger(qtd)||qtd<1)return alert('Informe uma quantidade inteira: 1, 2, 3...');const valor=Number(prompt('Valor unitário:','0')||0);itensOrcamento.push({id:uid(),descricao,unidade:'un',quantidade:qtd,valor,subtotal:qtd*valor});renderItens();atualizarPreview()}function removerItem(id){itensOrcamento=itensOrcamento.filter(i=>i.id!==id);renderItens();atualizarPreview()}function alterarQtd(id,qtd){const item=itensOrcamento.find(i=>i.id===id);if(!item)return;const q=parseInt(qtd||'1',10);item.quantidade=(!Number.isInteger(q)||q<1)?1:q;item.subtotal=item.quantidade*Number(item.valor||0);renderItens();atualizarPreview()}function valorParaNumero(valor){let texto=String(valor||'0').trim();texto=texto.split('R$').join('').split(' ').join('');if(texto.indexOf(',')>=0&&texto.indexOf('.')>=0){texto=texto.split('.').join('').replace(',','.')}else if(texto.indexOf(',')>=0){texto=texto.replace(',','.')}const numero=Number(texto);return Number.isFinite(numero)&&numero>=0?numero:0}function formatarValorInput(valor){return Number(valor||0).toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2})}function alterarValor(id,valor){const item=itensOrcamento.find(i=>i.id===id);if(!item)return;item.valor=valorParaNumero(valor);item.subtotal=Number(item.quantidade||0)*item.valor;renderItens();atualizarPreview()}
-    function renderItens(){
-      if(!itensOrcamento.length){
-        $('itensTela').innerHTML='<div class="empty-box">Nenhum item adicionado.</div>';
+
+    function salvarCliente() {
+      const nome = $("clienteNome").value.trim();
+
+      if (!nome) {
+        return alert("Informe o nome do cliente.");
+      }
+
+      const id = $("clienteId").value || uid();
+
+      const registro = {
+        id,
+        nome,
+        documento: $("clienteDoc").value.trim(),
+        telefone: $("clienteFone").value.trim(),
+        email: $("clienteEmail").value.trim(),
+        endereco: $("clienteEndereco").value.trim(),
+        numero: $("clienteNumero").value.trim()
+      };
+
+      const pos = clientes.findIndex((c) => c.id === id);
+
+      if (pos >= 0) {
+        clientes[pos] = registro;
+      } else {
+        clientes.unshift(registro);
+      }
+
+      salvarTudo();
+      limparCliente();
+      atualizarTela();
+
+      alert("Cliente salvo.");
+    }
+
+    function editarCliente(id) {
+      const c = clientes.find((x) => x.id === id);
+
+      if (!c) return;
+
+      $("clienteId").value = c.id;
+      $("clienteNome").value = c.nome || "";
+      $("clienteDoc").value = c.documento || "";
+      $("clienteFone").value = c.telefone || "";
+      $("clienteEmail").value = c.email || "";
+      $("clienteEndereco").value = c.endereco || "";
+      $("clienteNumero").value = c.numero || "";
+
+      abrirAba("clientes", document.querySelectorAll(".tabs button")[1]);
+    }
+
+    function excluirCliente(id) {
+      if (!confirm("Excluir cliente?")) return;
+
+      clientes = clientes.filter((c) => c.id !== id);
+
+      salvarTudo();
+      atualizarTela();
+    }
+
+    function limparCliente() {
+      $("clienteId").value = "";
+      $("clienteNome").value = "";
+      $("clienteDoc").value = "";
+      $("clienteFone").value = "";
+      $("clienteEmail").value = "";
+      $("clienteEndereco").value = "";
+      $("clienteNumero").value = "";
+    }
+        function renderClientes() {
+      if (!clientes.length) {
+        $("listaClientes").innerHTML = '<div class="empty-box">Nenhum cliente cadastrado.</div>';
         return;
       }
 
-      $('itensTela').innerHTML=itensOrcamento.map((i,index)=>`
-        <div class="orc-item-modern">
-          <div class="orc-item-modern-header">
-            <div class="orc-item-modern-left">
-              <span class="orc-item-modern-badge">#${index+1}</span>
-              <div>
-                <div class="orc-item-modern-title">${i.descricao}</div>
-                <div class="orc-item-modern-unit">Unidade: ${i.unidade || 'un'}</div>
-              </div>
-            </div>
-            <button class="orc-item-modern-remove" type="button" onclick="removerItem('${i.id}')">Remover</button>
-          </div>
-
-          <div class="orc-item-modern-grid">
-            <div class="orc-item-modern-field quantidade">
-              <label>Qtd.</label>
-              <input type="number" step="1" min="1" value="${i.quantidade}" onchange="alterarQtd('${i.id}',this.value)">
-            </div>
-
-            <div class="orc-item-modern-field valor-unitario">
-              <label>Valor unit.</label>
-              <input type="text" inputmode="decimal" value="${formatarValorInput(i.valor)}" onblur="alterarValor('${i.id}',this.value)" onkeydown="if(event.key==='Enter'){this.blur();}">
-            </div>
-
-            <div class="orc-item-modern-field total-item">
-              <label>Total</label>
-              <div class="orc-item-modern-total">${dinheiro.format(i.subtotal)}</div>
-            </div>
-          </div>
-        </div>
-      `).join('')
+      $("listaClientes").innerHTML = `
+        <table class="responsive">
+          <thead>
+            <tr>
+              <th>Cliente</th>
+              <th>Telefone</th>
+              <th>Ações</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${clientes
+              .map(
+                (c) => `
+                  <tr>
+                    <td data-label="Cliente">
+                      <strong>${c.nome}</strong><br>
+                      <span class="muted">${formatarDocumento(c.documento)}</span>
+                    </td>
+                    <td data-label="Telefone">${formatarTelefone(c.telefone)}</td>
+                    <td data-label="Ações">
+                      <button class="btn btn-light" type="button" onclick="editarCliente('${c.id}')">Editar</button>
+                      <button class="btn btn-danger" type="button" onclick="excluirCliente('${c.id}')">Excluir</button>
+                    </td>
+                  </tr>
+                `
+              )
+              .join("")}
+          </tbody>
+        </table>
+      `;
     }
 
-    function htmlPreview(){const cliente=clienteAtual();const t=totais();const numero=orcamentoEditandoId?(orcamentos.find(o=>o.id===orcamentoEditandoId)?.numero||proximoNumero()):proximoNumero();const logoHtml=empresa.logo?`<img src="${empresa.logo}" alt="Logo ViaTec">`:'VT';const contatoNome=empresa.responsavel||empresa.nome;const contatoCargo=empresa.cargo||'';const contatoFone=somenteNumeros(empresa.whatsapp||empresa.fone);const textoAprovacao=encodeURIComponent(`Olá, ${contatoNome}! Gostaria de aprovar o orçamento ${numero} no valor de ${dinheiro.format(t.total)}.`);const linkAprovacao=contatoFone?`https://wa.me/${contatoFone}?text=${textoAprovacao}`:'';const linhas=itensOrcamento.map(i=>`<tr><td>${i.descricao}</td><td>${i.unidade||''}</td><td>${parseInt(i.quantidade||0,10).toLocaleString('pt-BR')}</td><td>${dinheiro.format(Number(i.valor||0))}</td><td><strong>${dinheiro.format(Number(i.subtotal||0))}</strong></td></tr>`).join('');return`<div class="orc-head"><div class="company"><div class="logo-box">${logoHtml}</div><div><h2>${empresa.nome}</h2><p>CNPJ: ${empresa.cnpj}</p><p>Fone: ${formatarTelefone(empresa.fone)}</p>${empresa.email?`<p>E-mail: ${empresa.email}</p>`:''}<p>${empresa.endereco}</p></div></div><div class="orc-info"><h1>ORÇAMENTO</h1><p><strong>Nº:</strong> ${numero}</p><p><strong>Data:</strong> ${dataBR($('orcData').value)}</p><p><strong>Validade:</strong> ${dataBR($('orcValidade').value)}</p><p><strong>Status:</strong> ${$('orcStatus').value}</p></div></div><div class="box-grid"><div class="box"><h3>Cliente</h3>${cliente?`<p><strong>${cliente.nome}</strong></p><p><strong>CPF/CNPJ:</strong> ${formatarDocumento(cliente.documento)}</p><p><strong>Telefone:</strong> ${formatarTelefone(cliente.telefone)}</p><p><strong>E-mail:</strong> ${cliente.email||''}</p><p><strong>Endereço:</strong> ${enderecoCompletoCliente(cliente)}</p>`:'<p class="muted">Selecione um cliente.</p>'}</div><div class="box"><h3>Forma de pagamento</h3><p>${($('orcPagamento').value||'A combinar').replace(/\n/g,'<br>')}</p></div></div><table><thead><tr><th>Item</th><th>Un.</th><th>Qtd.</th><th>Valor Unit.</th><th>Subtotal</th></tr></thead><tbody>${linhas||'<tr><td colspan="5" class="muted">Adicione itens ao orçamento.</td></tr>'}</tbody></table><div class="totals"><div class="total-line"><span>Subtotal</span><strong>${dinheiro.format(t.subtotal)}</strong></div>${t.desconto > 0 ? `<div class="total-line"><span>Desconto</span><strong>${dinheiro.format(t.desconto)}</strong></div>` : ''}<div class="total-line final"><span>Total</span><strong>${dinheiro.format(t.total)}</strong></div></div>${$('orcObs').value?`<div class="box" style="margin-top:14px"><h3>Observações</h3><p>${$('orcObs').value.replace(/\n/g,'<br>')}</p></div>`:''}${empresa.mensagem?`<div class="box" style="margin-top:14px"><h3>Mensagem</h3><p>${empresa.mensagem}</p></div>`:''}<div class="aprovacao-box"><h3>Gostou do orçamento?</h3><p>Para aprovar ou tirar dúvidas, fale com: <strong>${contatoNome}</strong></p>${contatoCargo?`<p><strong>Função:</strong> ${contatoCargo}</p>`:''}${contatoFone?`<p><strong>WhatsApp:</strong> ${formatarTelefone(empresa.whatsapp||empresa.fone)}</p><a class="whatsapp-aprovar" href="${linkAprovacao}" target="_blank">✅ Aprovar pelo WhatsApp</a>`:'<p>Informe um WhatsApp de contato nos dados da empresa.</p>'}</div><div class="preview-footer">Orçamento gerado pela ViaTec.</div>`}
-    function atualizarPreview(){const preview=$('previewOrcamento');preview.className=empresa.timbrado?'com-timbrado':'';preview.style.backgroundImage=empresa.timbrado?`url('${empresa.timbrado}')`:'';preview.innerHTML=htmlPreview()}function salvarOrcamento(){const cliente=clienteAtual();if(!cliente)return alert('Selecione um cliente.');if(!itensOrcamento.length)return alert('Adicione pelo menos um item.');const t=totais();const id=orcamentoEditandoId||uid();const antigo=orcamentos.find(o=>o.id===id);const registro={id,numero:antigo?antigo.numero:proximoNumero(),clienteId:cliente.id,clienteNome:cliente.nome,data:$('orcData').value,validade:$('orcValidade').value,status:$('orcStatus').value,pagamento:$('orcPagamento').value,observacoes:$('orcObs').value,itens:JSON.parse(JSON.stringify(itensOrcamento)),subtotal:t.subtotal,desconto:t.desconto,total:t.total,criadoEm:antigo?antigo.criadoEm:new Date().toISOString()};const pos=orcamentos.findIndex(o=>o.id===id);if(pos>=0)orcamentos[pos]=registro;else orcamentos.unshift(registro);salvarTudo();renderOrcamentos();renderDashboardLite();alert('Orçamento salvo com sucesso.')}function editarOrcamento(id){const o=orcamentos.find(x=>x.id===id);if(!o)return;orcamentoEditandoId=id;$('orcCliente').value=o.clienteId;renderClientePicker();$('orcData').value=o.data;$('orcValidade').value=o.validade;$('orcStatus').value=o.status;renderStatusPicker();$('orcPagamento').value=o.pagamento||'';$('orcObs').value=o.observacoes||'';$('orcDesconto').value=o.desconto||0;itensOrcamento=JSON.parse(JSON.stringify(o.itens||[]));renderItens();atualizarPreview();abrirAba('orcamento',document.querySelectorAll('.tabs button')[0])}function excluirOrcamento(id){if(!confirm('Excluir orçamento?'))return;orcamentos=orcamentos.filter(o=>o.id!==id);salvarTudo();renderOrcamentos();renderDashboardLite()}function duplicarOrcamento(id){const o=orcamentos.find(x=>x.id===id);if(!o)return;orcamentoEditandoId=null;$('orcCliente').value=o.clienteId;renderClientePicker();$('orcData').value=hojeISO();$('orcValidade').value=addDias(hojeISO(),7);$('orcStatus').value='aberto';renderStatusPicker();$('orcPagamento').value=o.pagamento||'';$('orcObs').value=o.observacoes||'';$('orcDesconto').value=o.desconto||0;itensOrcamento=JSON.parse(JSON.stringify(o.itens||[]));itensOrcamento.forEach(i=>i.id=uid());renderItens();atualizarPreview();abrirAba('orcamento',document.querySelectorAll('.tabs button')[0])}function limparOrcamento(){orcamentoEditandoId=null;$('orcCliente').value='';renderClientePicker();$('orcData').value=hojeISO();$('orcValidade').value=addDias(hojeISO(),7);$('orcStatus').value='aberto';renderStatusPicker();$('orcPagamento').value='';$('orcObs').value='';$('orcDesconto').value=0;itensOrcamento=[];renderItens();atualizarPreview()}function renderOrcamentos(){if(!orcamentos.length){$('listaOrcamentos').innerHTML='<div class="empty-box">Nenhum orçamento salvo.</div>';return}$('listaOrcamentos').innerHTML=`<table class="responsive"><thead><tr><th>Nº</th><th>Cliente</th><th>Data</th><th>Status</th><th>Total</th><th>Ações</th></tr></thead><tbody>${orcamentos.map(o=>`<tr><td data-label="Nº"><strong>${o.numero}</strong></td><td data-label="Cliente">${o.clienteNome}</td><td data-label="Data">${dataBR(o.data)}</td><td data-label="Status"><span class="status">${o.status}</span></td><td data-label="Total" class="money">${dinheiro.format(Number(o.total||0))}</td><td data-label="Ações"><button class="btn btn-light" type="button" onclick="editarOrcamento('${o.id}')">Abrir</button> <button class="btn btn-success" type="button" onclick="duplicarOrcamento('${o.id}')">Duplicar</button> <button class="btn btn-danger" type="button" onclick="excluirOrcamento('${o.id}')">Excluir</button></td></tr>`).join('')}</tbody></table>`}
-    function baixarPDF(){
+    function salvarProduto() {
+      const descricao = $("produtoDesc").value.trim();
+
+      if (!descricao) {
+        return alert("Informe a descrição do produto/serviço.");
+      }
+
+      const id = $("produtoId").value || uid();
+
+      const registro = {
+        id,
+        descricao,
+        unidade: $("produtoUn").value,
+        valor: Number($("produtoValor").value || 0)
+      };
+
+      const pos = produtos.findIndex((p) => p.id === id);
+
+      if (pos >= 0) {
+        produtos[pos] = registro;
+      } else {
+        produtos.unshift(registro);
+      }
+
+      salvarTudo();
+      limparProduto();
+      atualizarTela();
+
+      alert("Produto/serviço salvo.");
+    }
+
+    function editarProduto(id) {
+      const p = produtos.find((x) => x.id === id);
+
+      if (!p) return;
+
+      $("produtoId").value = p.id;
+      $("produtoDesc").value = p.descricao || "";
+      $("produtoUn").value = p.unidade || "un";
+      $("produtoValor").value = p.valor || 0;
+
+      renderUnidadePicker();
+
+      abrirAba("produtos", document.querySelectorAll(".tabs button")[2]);
+    }
+
+    function excluirProduto(id) {
+      if (!confirm("Excluir produto/serviço?")) return;
+
+      produtos = produtos.filter((p) => p.id !== id);
+
+      salvarTudo();
+      atualizarTela();
+    }
+
+    function limparProduto() {
+      $("produtoId").value = "";
+      $("produtoDesc").value = "";
+      $("produtoUn").value = "un";
+      $("produtoValor").value = "";
+
+      renderUnidadePicker();
+    }
+
+    function renderProdutos() {
+      if (!produtos.length) {
+        $("listaProdutos").innerHTML = '<div class="empty-box">Nenhum produto/serviço cadastrado.</div>';
+        return;
+      }
+
+      $("listaProdutos").innerHTML = `
+        <table class="responsive">
+          <thead>
+            <tr>
+              <th>Descrição</th>
+              <th>Un.</th>
+              <th>Valor</th>
+              <th>Ações</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${produtos
+              .map(
+                (p) => `
+                  <tr>
+                    <td data-label="Descrição">
+                      <strong>${p.descricao}</strong>
+                    </td>
+                    <td data-label="Un.">${p.unidade}</td>
+                    <td data-label="Valor" class="money">${dinheiro.format(Number(p.valor || 0))}</td>
+                    <td data-label="Ações">
+                      <button class="btn btn-light" type="button" onclick="editarProduto('${p.id}')">Editar</button>
+                      <button class="btn btn-danger" type="button" onclick="excluirProduto('${p.id}')">Excluir</button>
+                    </td>
+                  </tr>
+                `
+              )
+              .join("")}
+          </tbody>
+        </table>
+      `;
+    }
+
+    function adicionarProduto() {
+      const id = $("produtoSelecionado").value;
+      const qtd = parseInt($("itemQtd").value || "1", 10);
+      const p = produtos.find((x) => x.id === id);
+
+      if (!p) {
+        return alert("Selecione um produto/serviço.");
+      }
+
+      if (!Number.isInteger(qtd) || qtd < 1) {
+        return alert("Informe uma quantidade inteira: 1, 2, 3...");
+      }
+
+      itensOrcamento.push({
+        id: uid(),
+        descricao: p.descricao,
+        unidade: p.unidade,
+        quantidade: qtd,
+        valor: Number(p.valor || 0),
+        subtotal: qtd * Number(p.valor || 0)
+      });
+
+      $("produtoSelecionado").value = "";
+      $("itemQtd").value = 1;
+
+      renderProdutoPicker();
+      renderItens();
       atualizarPreview();
-      const numero = orcamentoEditandoId ? (orcamentos.find(o => o.id === orcamentoEditandoId)?.numero || 'orcamento') : 'orcamento-preview';
-      const conteudo = $('previewOrcamento').innerHTML;
-      const classeTimbrado = empresa.timbrado ? 'com-timbrado' : '';
-      const fundoTimbrado = empresa.timbrado ? "background-image:url('" + empresa.timbrado + "');" : '';
-      const janela = window.open('', '_blank');
+    }
+
+    function adicionarManual() {
+      const descricao = prompt("Descrição do item:");
+
+      if (!descricao) return;
+
+      const qtd = parseInt(prompt("Quantidade:", "1") || "1", 10);
+
+      if (!Number.isInteger(qtd) || qtd < 1) {
+        return alert("Informe uma quantidade inteira: 1, 2, 3...");
+      }
+
+      const valor = Number(prompt("Valor unitário:", "0") || 0);
+
+      itensOrcamento.push({
+        id: uid(),
+        descricao,
+        unidade: "un",
+        quantidade: qtd,
+        valor,
+        subtotal: qtd * valor
+      });
+
+      renderItens();
+      atualizarPreview();
+    }
+
+    function removerItem(id) {
+      itensOrcamento = itensOrcamento.filter((i) => i.id !== id);
+
+      renderItens();
+      atualizarPreview();
+    }
+
+    function alterarQtd(id, qtd) {
+      const item = itensOrcamento.find((i) => i.id === id);
+
+      if (!item) return;
+
+      const q = parseInt(qtd || "1", 10);
+
+      item.quantidade = !Number.isInteger(q) || q < 1 ? 1 : q;
+      item.subtotal = item.quantidade * Number(item.valor || 0);
+
+      renderItens();
+      atualizarPreview();
+    }
+
+    function valorParaNumero(valor) {
+      let texto = String(valor || "0").trim();
+
+      texto = texto.split("R$").join("");
+      texto = texto.split(" ").join("");
+
+      if (texto.indexOf(",") >= 0 && texto.indexOf(".") >= 0) {
+        texto = texto.split(".").join("");
+        texto = texto.replace(",", ".");
+      } else if (texto.indexOf(",") >= 0) {
+        texto = texto.replace(",", ".");
+      }
+
+      const numero = Number(texto);
+
+      return Number.isFinite(numero) && numero >= 0 ? numero : 0;
+    }
+
+    function formatarValorInput(valor) {
+      return Number(valor || 0).toLocaleString("pt-BR", {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2
+      });
+    }
+
+    function alterarValor(id, valor) {
+      const item = itensOrcamento.find((i) => i.id === id);
+
+      if (!item) return;
+
+      item.valor = valorParaNumero(valor);
+      item.subtotal = Number(item.quantidade || 0) * item.valor;
+
+      renderItens();
+      atualizarPreview();
+    }
+
+    function renderItens() {
+      if (!itensOrcamento.length) {
+        $("itensTela").innerHTML = '<div class="empty-box">Nenhum item adicionado.</div>';
+        return;
+      }
+
+      $("itensTela").innerHTML = itensOrcamento
+        .map(
+          (i, index) => `
+            <div class="orc-item-modern">
+              <div class="orc-item-modern-header">
+                <div class="orc-item-modern-left">
+                  <span class="orc-item-modern-badge">#${index + 1}</span>
+
+                  <div>
+                    <div class="orc-item-modern-title">${i.descricao}</div>
+                    <div class="orc-item-modern-unit">Unidade: ${i.unidade || "un"}</div>
+                  </div>
+                </div>
+
+                <button class="orc-item-modern-remove" type="button" onclick="removerItem('${i.id}')">
+                  Remover
+                </button>
+              </div>
+
+              <div class="orc-item-modern-grid">
+                <div class="orc-item-modern-field quantidade">
+                  <label>Qtd.</label>
+                  <input
+                    type="number"
+                    step="1"
+                    min="1"
+                    value="${i.quantidade}"
+                    onchange="alterarQtd('${i.id}', this.value)"
+                  >
+                </div>
+
+                <div class="orc-item-modern-field valor-unitario">
+                  <label>Valor unit.</label>
+                  <input
+                    type="text"
+                    inputmode="decimal"
+                    value="${formatarValorInput(i.valor)}"
+                    onblur="alterarValor('${i.id}', this.value)"
+                    onkeydown="if(event.key === 'Enter'){ this.blur(); }"
+                  >
+                </div>
+
+                <div class="orc-item-modern-field total-item">
+                  <label>Total</label>
+                  <div class="orc-item-modern-total">${dinheiro.format(i.subtotal)}</div>
+                </div>
+              </div>
+            </div>
+          `
+        )
+        .join("");
+    }
+        function htmlPreview() {
+      const cliente = clienteAtual();
+      const t = totais();
+
+      const numero = orcamentoEditandoId
+        ? orcamentos.find((o) => o.id === orcamentoEditandoId)?.numero || proximoNumero()
+        : proximoNumero();
+
+      const logoHtml = empresa.logo ? `<img src="${empresa.logo}" alt="Logo ViaTec">` : "VT";
+
+      const contatoNome = empresa.responsavel || empresa.nome;
+      const contatoCargo = empresa.cargo || "";
+      const contatoFone = somenteNumeros(empresa.whatsapp || empresa.fone);
+
+      const textoAprovacao = encodeURIComponent(
+        `Olá, ${contatoNome}! Gostaria de aprovar o orçamento ${numero} no valor de ${dinheiro.format(t.total)}.`
+      );
+
+      const linkAprovacao = contatoFone ? `https://wa.me/${contatoFone}?text=${textoAprovacao}` : "";
+
+      const linhas = itensOrcamento
+        .map(
+          (i) => `
+            <tr>
+              <td>${i.descricao}</td>
+              <td>${i.unidade || ""}</td>
+              <td>${parseInt(i.quantidade || 0, 10).toLocaleString("pt-BR")}</td>
+              <td>${dinheiro.format(Number(i.valor || 0))}</td>
+              <td><strong>${dinheiro.format(Number(i.subtotal || 0))}</strong></td>
+            </tr>
+          `
+        )
+        .join("");
+
+      return `
+        <div class="orc-head">
+          <div class="company">
+            <div class="logo-box">${logoHtml}</div>
+
+            <div>
+              <h2>${empresa.nome}</h2>
+              <p>CNPJ: ${empresa.cnpj}</p>
+              <p>Fone: ${formatarTelefone(empresa.fone)}</p>
+              ${empresa.email ? `<p>E-mail: ${empresa.email}</p>` : ""}
+              <p>${empresa.endereco}</p>
+            </div>
+          </div>
+
+          <div class="orc-info">
+            <h1>ORÇAMENTO</h1>
+            <p><strong>Nº:</strong> ${numero}</p>
+            <p><strong>Data:</strong> ${dataBR($("orcData").value)}</p>
+            <p><strong>Validade:</strong> ${dataBR($("orcValidade").value)}</p>
+            <p><strong>Status:</strong> ${$("orcStatus").value}</p>
+          </div>
+        </div>
+
+        <div class="box-grid">
+          <div class="box">
+            <h3>Cliente</h3>
+            ${
+              cliente
+                ? `
+                  <p><strong>${cliente.nome}</strong></p>
+                  <p><strong>CPF/CNPJ:</strong> ${formatarDocumento(cliente.documento)}</p>
+                  <p><strong>Telefone:</strong> ${formatarTelefone(cliente.telefone)}</p>
+                  <p><strong>E-mail:</strong> ${cliente.email || ""}</p>
+                  <p><strong>Endereço:</strong> ${enderecoCompletoCliente(cliente)}</p>
+                `
+                : '<p class="muted">Selecione um cliente.</p>'
+            }
+          </div>
+
+          <div class="box">
+            <h3>Forma de pagamento</h3>
+            <p>${($("orcPagamento").value || "A combinar").replace(/\n/g, "<br>")}</p>
+          </div>
+        </div>
+
+        <table>
+          <thead>
+            <tr>
+              <th>Item</th>
+              <th>Un.</th>
+              <th>Qtd.</th>
+              <th>Valor Unit.</th>
+              <th>Subtotal</th>
+            </tr>
+          </thead>
+
+          <tbody>
+            ${linhas || '<tr><td colspan="5" class="muted">Adicione itens ao orçamento.</td></tr>'}
+          </tbody>
+        </table>
+
+        <div class="totals">
+          <div class="total-line">
+            <span>Subtotal</span>
+            <strong>${dinheiro.format(t.subtotal)}</strong>
+          </div>
+
+          ${
+            t.desconto > 0
+              ? `
+                <div class="total-line">
+                  <span>Desconto</span>
+                  <strong>${dinheiro.format(t.desconto)}</strong>
+                </div>
+              `
+              : ""
+          }
+
+          <div class="total-line final">
+            <span>Total</span>
+            <strong>${dinheiro.format(t.total)}</strong>
+          </div>
+        </div>
+
+        ${
+          $("orcObs").value
+            ? `
+              <div class="box" style="margin-top:14px;">
+                <h3>Observações</h3>
+                <p>${$("orcObs").value.replace(/\n/g, "<br>")}</p>
+              </div>
+            `
+            : ""
+        }
+
+        ${
+          empresa.mensagem
+            ? `
+              <div class="box" style="margin-top:14px;">
+                <h3>Mensagem</h3>
+                <p>${empresa.mensagem}</p>
+              </div>
+            `
+            : ""
+        }
+
+        <div class="aprovacao-box">
+          <h3>Gostou do orçamento?</h3>
+          <p>Para aprovar ou tirar dúvidas, fale com: <strong>${contatoNome}</strong></p>
+          ${contatoCargo ? `<p><strong>Função:</strong> ${contatoCargo}</p>` : ""}
+
+          ${
+            contatoFone
+              ? `
+                <p><strong>WhatsApp:</strong> ${formatarTelefone(empresa.whatsapp || empresa.fone)}</p>
+                <a class="whatsapp-aprovar" href="${linkAprovacao}" target="_blank">✅ Aprovar pelo WhatsApp</a>
+              `
+              : "<p>Informe um WhatsApp de contato nos dados da empresa.</p>"
+          }
+        </div>
+
+        <div class="preview-footer">
+          Orçamento gerado pela ViaTec.
+        </div>
+      `;
+    }
+
+    function atualizarPreview() {
+      const preview = $("previewOrcamento");
+
+      preview.className = empresa.timbrado ? "com-timbrado" : "";
+      preview.style.backgroundImage = empresa.timbrado ? `url('${empresa.timbrado}')` : "";
+      preview.innerHTML = htmlPreview();
+    }
+
+    function salvarOrcamento() {
+      const cliente = clienteAtual();
+
+      if (!cliente) {
+        return alert("Selecione um cliente.");
+      }
+
+      if (!itensOrcamento.length) {
+        return alert("Adicione pelo menos um item.");
+      }
+
+      const t = totais();
+      const id = orcamentoEditandoId || uid();
+      const antigo = orcamentos.find((o) => o.id === id);
+
+      const registro = {
+        id,
+        numero: antigo ? antigo.numero : proximoNumero(),
+        clienteId: cliente.id,
+        clienteNome: cliente.nome,
+        data: $("orcData").value,
+        validade: $("orcValidade").value,
+        status: $("orcStatus").value,
+        pagamento: $("orcPagamento").value,
+        observacoes: $("orcObs").value,
+        itens: JSON.parse(JSON.stringify(itensOrcamento)),
+        subtotal: t.subtotal,
+        desconto: t.desconto,
+        total: t.total,
+        criadoEm: antigo ? antigo.criadoEm : new Date().toISOString()
+      };
+
+      const pos = orcamentos.findIndex((o) => o.id === id);
+
+      if (pos >= 0) {
+        orcamentos[pos] = registro;
+      } else {
+        orcamentos.unshift(registro);
+      }
+
+      salvarTudo();
+      renderOrcamentos();
+      renderDashboardLite();
+
+      alert("Orçamento salvo com sucesso.");
+    }
+
+    function editarOrcamento(id) {
+      const o = orcamentos.find((x) => x.id === id);
+
+      if (!o) return;
+
+      orcamentoEditandoId = id;
+
+      $("orcCliente").value = o.clienteId;
+      renderClientePicker();
+
+      $("orcData").value = o.data;
+      $("orcValidade").value = o.validade;
+
+      $("orcStatus").value = o.status;
+      renderStatusPicker();
+
+      $("orcPagamento").value = o.pagamento || "";
+      $("orcObs").value = o.observacoes || "";
+      $("orcDesconto").value = o.desconto || 0;
+
+      itensOrcamento = JSON.parse(JSON.stringify(o.itens || []));
+
+      renderItens();
+      atualizarPreview();
+
+      abrirAba("orcamento", document.querySelectorAll(".tabs button")[0]);
+    }
+
+    function excluirOrcamento(id) {
+      if (!confirm("Excluir orçamento?")) return;
+
+      orcamentos = orcamentos.filter((o) => o.id !== id);
+
+      salvarTudo();
+      renderOrcamentos();
+      renderDashboardLite();
+    }
+
+    function duplicarOrcamento(id) {
+      const o = orcamentos.find((x) => x.id === id);
+
+      if (!o) return;
+
+      orcamentoEditandoId = null;
+
+      $("orcCliente").value = o.clienteId;
+      renderClientePicker();
+
+      $("orcData").value = hojeISO();
+      $("orcValidade").value = addDias(hojeISO(), 7);
+
+      $("orcStatus").value = "aberto";
+      renderStatusPicker();
+
+      $("orcPagamento").value = o.pagamento || "";
+      $("orcObs").value = o.observacoes || "";
+      $("orcDesconto").value = o.desconto || 0;
+
+      itensOrcamento = JSON.parse(JSON.stringify(o.itens || []));
+      itensOrcamento.forEach((i) => (i.id = uid()));
+
+      renderItens();
+      atualizarPreview();
+
+      abrirAba("orcamento", document.querySelectorAll(".tabs button")[0]);
+    }
+
+    function limparOrcamento() {
+      orcamentoEditandoId = null;
+
+      $("orcCliente").value = "";
+      renderClientePicker();
+
+      $("orcData").value = hojeISO();
+      $("orcValidade").value = addDias(hojeISO(), 7);
+
+      $("orcStatus").value = "aberto";
+      renderStatusPicker();
+
+      $("orcPagamento").value = "";
+      $("orcObs").value = "";
+      $("orcDesconto").value = 0;
+
+      itensOrcamento = [];
+
+      renderItens();
+      atualizarPreview();
+    }
+        function renderOrcamentos() {
+      if (!orcamentos.length) {
+        $("listaOrcamentos").innerHTML = '<div class="empty-box">Nenhum orçamento salvo.</div>';
+        return;
+      }
+
+      $("listaOrcamentos").innerHTML = `
+        <table class="responsive">
+          <thead>
+            <tr>
+              <th>Nº</th>
+              <th>Cliente</th>
+              <th>Data</th>
+              <th>Status</th>
+              <th>Total</th>
+              <th>Ações</th>
+            </tr>
+          </thead>
+
+          <tbody>
+            ${orcamentos
+              .map(
+                (o) => `
+                  <tr>
+                    <td data-label="Nº"><strong>${o.numero}</strong></td>
+                    <td data-label="Cliente">${o.clienteNome}</td>
+                    <td data-label="Data">${dataBR(o.data)}</td>
+                    <td data-label="Status"><span class="status">${o.status}</span></td>
+                    <td data-label="Total" class="money">${dinheiro.format(Number(o.total || 0))}</td>
+                    <td data-label="Ações">
+                      <button class="btn btn-light" type="button" onclick="editarOrcamento('${o.id}')">Abrir</button>
+                      <button class="btn btn-success" type="button" onclick="duplicarOrcamento('${o.id}')">Duplicar</button>
+                      <button class="btn btn-danger" type="button" onclick="excluirOrcamento('${o.id}')">Excluir</button>
+                    </td>
+                  </tr>
+                `
+              )
+              .join("")}
+          </tbody>
+        </table>
+      `;
+    }
+
+    function baixarPDF() {
+      atualizarPreview();
+
+      const numero = orcamentoEditandoId
+        ? orcamentos.find((o) => o.id === orcamentoEditandoId)?.numero || "orcamento"
+        : "orcamento-preview";
+
+      const conteudo = $("previewOrcamento").innerHTML;
+      const classeTimbrado = empresa.timbrado ? "com-timbrado" : "";
+      const fundoTimbrado = empresa.timbrado ? "background-image:url('" + empresa.timbrado + "');" : "";
+      const janela = window.open("", "_blank");
 
       if (!janela) {
-        alert('O navegador bloqueou a janela do PDF. Libere pop-ups para este site e tente novamente.');
+        alert("O navegador bloqueou a janela do PDF. Libere pop-ups para este site e tente novamente.");
         return;
       }
 
       janela.document.open();
+
       janela.document.write(`<!DOCTYPE html>
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8">
   <title>${numero}</title>
+
   <style>
-    @page { size: A4 portrait; margin: 10mm; }
-    * { box-sizing: border-box; }
+    @page {
+      size: A4 portrait;
+      margin: 10mm;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
     body {
       margin: 0;
       font-family: Arial, Helvetica, sans-serif;
       color: #1f2937;
-      background: white;
+      background: #ffffff;
       -webkit-print-color-adjust: exact;
       print-color-adjust: exact;
     }
+
     #pdfArea {
       width: 190mm;
       margin: 0 auto;
-      background: white;
+      background: #ffffff;
       color: #111827;
       position: relative;
       overflow: visible;
@@ -3348,6 +3263,7 @@
       background-position: center top;
       background-repeat: no-repeat;
     }
+
     #pdfArea.com-timbrado::before {
       content: "";
       position: absolute;
@@ -3356,7 +3272,12 @@
       pointer-events: none;
       z-index: 0;
     }
-    #pdfArea > * { position: relative; z-index: 1; }
+
+    #pdfArea > * {
+      position: relative;
+      z-index: 1;
+    }
+
     .orc-head {
       display: flex;
       justify-content: space-between;
@@ -3366,13 +3287,18 @@
       margin-bottom: 18px;
       break-inside: avoid;
     }
-    .company { display: flex; gap: 12px; }
+
+    .company {
+      display: flex;
+      gap: 12px;
+    }
+
     .logo-box {
       width: 72px;
       height: 72px;
       border-radius: 14px;
       background: linear-gradient(135deg, #0057b8, #00a859);
-      color: white;
+      color: #ffffff;
       display: flex;
       align-items: center;
       justify-content: center;
@@ -3382,17 +3308,38 @@
       overflow: hidden;
       border: 1px solid #e5e7eb;
     }
+
     .logo-box img {
       width: 100%;
       height: 100%;
       object-fit: contain;
-      background: white;
+      background: #ffffff;
       padding: 4px;
     }
-    .company h2 { margin: 0; color: #003b7a; font-size: 20px; }
-    .company p, .orc-info p { margin: 3px 0; font-size: 12px; color: #4b5563; }
-    .orc-info { text-align: right; }
-    .orc-info h1 { margin: 0 0 8px; color: #003b7a; font-size: 28px; }
+
+    .company h2 {
+      margin: 0;
+      color: #003b7a;
+      font-size: 20px;
+    }
+
+    .company p,
+    .orc-info p {
+      margin: 3px 0;
+      font-size: 12px;
+      color: #4b5563;
+    }
+
+    .orc-info {
+      text-align: right;
+    }
+
+    .orc-info h1 {
+      margin: 0 0 8px;
+      color: #003b7a;
+      font-size: 28px;
+    }
+
     .box-grid {
       display: grid;
       grid-template-columns: 1fr 1fr;
@@ -3400,6 +3347,7 @@
       margin-bottom: 16px;
       break-inside: avoid;
     }
+
     .box {
       border: 1px solid #e5e7eb;
       border-radius: 13px;
@@ -3407,22 +3355,40 @@
       background: rgba(255,255,255,.94);
       break-inside: avoid;
     }
-    .box h3 { margin: 0 0 8px; color: #003b7a; font-size: 15px; }
-    .box p { margin: 3px 0; font-size: 13px; }
-    table { width: 100%; border-collapse: collapse; margin-top: 8px; }
-    th, td {
+
+    .box h3 {
+      margin: 0 0 8px;
+      color: #003b7a;
+      font-size: 15px;
+    }
+
+    .box p {
+      margin: 3px 0;
+      font-size: 13px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 8px;
+    }
+
+    th,
+    td {
       padding: 8px 9px;
       border-bottom: 1px solid #edf1f7;
       text-align: left;
       font-size: 12px;
       vertical-align: top;
     }
+
     th {
       background: #eaf3ff;
       color: #003b7a;
       font-size: 11px;
       text-transform: uppercase;
     }
+
     .totals {
       margin-top: 14px;
       margin-left: auto;
@@ -3432,7 +3398,14 @@
       padding: 12px;
       break-inside: avoid;
     }
-    .total-line { display: flex; justify-content: space-between; margin: 6px 0; font-size: 13px; }
+
+    .total-line {
+      display: flex;
+      justify-content: space-between;
+      margin: 6px 0;
+      font-size: 13px;
+    }
+
     .total-line.final {
       font-size: 20px;
       font-weight: 900;
@@ -3440,6 +3413,7 @@
       border-top: 1px solid rgba(0,87,184,.18);
       padding-top: 8px;
     }
+
     .aprovacao-box {
       margin-top: 14px;
       border: 1px solid #c9f3dd;
@@ -3448,8 +3422,18 @@
       padding: 12px;
       break-inside: avoid;
     }
-    .aprovacao-box h3 { margin: 0 0 8px; color: #007a41; font-size: 15px; }
-    .aprovacao-box p { margin: 4px 0; font-size: 12px; }
+
+    .aprovacao-box h3 {
+      margin: 0 0 8px;
+      color: #007a41;
+      font-size: 15px;
+    }
+
+    .aprovacao-box p {
+      margin: 4px 0;
+      font-size: 12px;
+    }
+
     .whatsapp-aprovar {
       display: inline-flex;
       margin-top: 8px;
@@ -3458,11 +3442,12 @@
       padding: 10px 13px;
       border-radius: 12px;
       background: linear-gradient(135deg,#00a859,#007a41);
-      color: white;
+      color: #ffffff;
       text-decoration: none;
       font-weight: 900;
       font-size: 12px;
     }
+
     .preview-footer {
       border-top: 1px solid #e5e7eb;
       margin-top: 14px;
@@ -3470,26 +3455,166 @@
       font-size: 11px;
       color: #4b5563;
     }
+
     @media print {
-      body { background: white; }
-      #pdfArea { margin: 0; }
+      body {
+        background: #ffffff;
+      }
+
+      #pdfArea {
+        margin: 0;
+      }
     }
   </style>
 </head>
+
 <body>
-  <div id="pdfArea" class="${classeTimbrado}">${conteudo}</div>
+  <div id="pdfArea" class="${classeTimbrado}">
+    ${conteudo}
+  </div>
+
   <script>
-    window.onload = function(){
-      setTimeout(function(){ window.print(); }, 350);
+    window.onload = function () {
+      setTimeout(function () {
+        window.print();
+      }, 350);
     };
   <\/script>
 </body>
 </html>`);
+
       janela.document.close();
     }
 
-    function enviarWhatsApp(){const cliente=clienteAtual();if(!cliente)return alert('Selecione um cliente.');const t=totais();const itens=itensOrcamento.map(i=>`• ${i.descricao} - ${i.quantidade} ${i.unidade} x ${dinheiro.format(i.valor)} = ${dinheiro.format(i.subtotal)}`).join('%0A');const texto=`Olá, ${cliente.nome}!%0A%0ASegue orçamento da ${empresa.nome}:%0A%0A${itens}%0A%0ATotal: ${dinheiro.format(t.total)}%0AValidade: ${dataBR($('orcValidade').value)}%0A%0A${empresa.mensagem}`;const fone=somenteNumeros(cliente.telefone);window.open(fone?`https://wa.me/${fone}?text=${texto}`:`https://wa.me/?text=${texto}`,'_blank')}
-    function salvarEmpresa(){empresa.nome=$('empNome').value.trim();empresa.cnpj=$('empCnpj').value.trim();empresa.fone=$('empFone').value.trim();empresa.email=$('empEmail').value.trim();empresa.endereco=$('empEndereco').value.trim();empresa.mensagem=$('empMsg').value.trim();empresa.responsavel=$('empResponsavel').value.trim();empresa.cargo=$('empCargo').value.trim();empresa.whatsapp=somenteNumeros($('empWhatsapp').value.trim());salvarTudo();atualizarPreview();alert('Dados da empresa salvos.')}function carregarEmpresaTela(){$('empNome').value=empresa.nome;$('empCnpj').value=empresa.cnpj;$('empFone').value=empresa.fone;$('empEmail').value=empresa.email;$('empEndereco').value=empresa.endereco;$('empMsg').value=empresa.mensagem;$('empResponsavel').value=empresa.responsavel||'';$('empCargo').value=empresa.cargo||'';$('empWhatsapp').value=formatarTelefone(empresa.whatsapp||empresa.fone||'')}function carregarTimbrado(event){const file=event.target.files&&event.target.files[0];if(!file)return;const reader=new FileReader();reader.onload=()=>{empresa.timbrado=reader.result;salvarTudo();atualizarPreview();alert('Folha timbrada carregada.')};reader.readAsDataURL(file)}function carregarLogo(event){const file=event.target.files&&event.target.files[0];if(!file)return;const reader=new FileReader();reader.onload=()=>{empresa.logo=reader.result;salvarTudo();atualizarPreview();alert('Logo carregada.')};reader.readAsDataURL(file)}function removerTimbrado(){empresa.timbrado='';$('empTimbrado').value='';salvarTudo();atualizarPreview();alert('Folha timbrada removida.')}function removerLogo(){empresa.logo='';if($('empLogo'))$('empLogo').value='';salvarTudo();atualizarPreview();alert('Logo removida.')}function renderDashboardLite(){$('dataHoje').textContent=new Date().toLocaleDateString('pt-BR')}function atualizarTela(){renderSelects();renderClientes();renderProdutos();renderItens();renderOrcamentos();carregarEmpresaTela();atualizarPreview();renderDashboardLite()}document.addEventListener('DOMContentLoaded',()=>{carregarTudo();$('orcData').value=hojeISO();$('orcValidade').value=addDias(hojeISO(),7);atualizarTela()});
+    function enviarWhatsApp() {
+      const cliente = clienteAtual();
+
+      if (!cliente) {
+        return alert("Selecione um cliente.");
+      }
+
+      const t = totais();
+
+      const itens = itensOrcamento
+        .map((i) => `• ${i.descricao} - ${i.quantidade} ${i.unidade} x ${dinheiro.format(i.valor)} = ${dinheiro.format(i.subtotal)}`)
+        .join("%0A");
+
+      const texto = `Olá, ${cliente.nome}!%0A%0ASegue orçamento da ${empresa.nome}:%0A%0A${itens}%0A%0ATotal: ${dinheiro.format(t.total)}%0AValidade: ${dataBR($("orcValidade").value)}%0A%0A${empresa.mensagem}`;
+
+      const fone = somenteNumeros(cliente.telefone);
+
+      window.open(fone ? `https://wa.me/${fone}?text=${texto}` : `https://wa.me/?text=${texto}`, "_blank");
+    }
+
+    function salvarEmpresa() {
+      empresa.nome = $("empNome").value.trim();
+      empresa.cnpj = $("empCnpj").value.trim();
+      empresa.fone = $("empFone").value.trim();
+      empresa.email = $("empEmail").value.trim();
+      empresa.endereco = $("empEndereco").value.trim();
+      empresa.mensagem = $("empMsg").value.trim();
+      empresa.responsavel = $("empResponsavel").value.trim();
+      empresa.cargo = $("empCargo").value.trim();
+      empresa.whatsapp = somenteNumeros($("empWhatsapp").value.trim());
+
+      salvarTudo();
+      atualizarPreview();
+
+      alert("Dados da empresa salvos.");
+    }
+
+    function carregarEmpresaTela() {
+      $("empNome").value = empresa.nome;
+      $("empCnpj").value = empresa.cnpj;
+      $("empFone").value = empresa.fone;
+      $("empEmail").value = empresa.email;
+      $("empEndereco").value = empresa.endereco;
+      $("empMsg").value = empresa.mensagem;
+      $("empResponsavel").value = empresa.responsavel || "";
+      $("empCargo").value = empresa.cargo || "";
+      $("empWhatsapp").value = formatarTelefone(empresa.whatsapp || empresa.fone || "");
+    }
+
+    function carregarTimbrado(event) {
+      const file = event.target.files && event.target.files[0];
+
+      if (!file) return;
+
+      const reader = new FileReader();
+
+      reader.onload = () => {
+        empresa.timbrado = reader.result;
+        salvarTudo();
+        atualizarPreview();
+        alert("Folha timbrada carregada.");
+      };
+
+      reader.readAsDataURL(file);
+    }
+
+    function carregarLogo(event) {
+      const file = event.target.files && event.target.files[0];
+
+      if (!file) return;
+
+      const reader = new FileReader();
+
+      reader.onload = () => {
+        empresa.logo = reader.result;
+        salvarTudo();
+        atualizarPreview();
+        alert("Logo carregada.");
+      };
+
+      reader.readAsDataURL(file);
+    }
+
+    function removerTimbrado() {
+      empresa.timbrado = "";
+      $("empTimbrado").value = "";
+
+      salvarTudo();
+      atualizarPreview();
+
+      alert("Folha timbrada removida.");
+    }
+
+    function removerLogo() {
+      empresa.logo = "";
+
+      if ($("empLogo")) {
+        $("empLogo").value = "";
+      }
+
+      salvarTudo();
+      atualizarPreview();
+
+      alert("Logo removida.");
+    }
+
+    function renderDashboardLite() {
+      $("dataHoje").textContent = new Date().toLocaleDateString("pt-BR");
+    }
+
+    function atualizarTela() {
+      renderSelects();
+      renderClientes();
+      renderProdutos();
+      renderItens();
+      renderOrcamentos();
+      carregarEmpresaTela();
+      atualizarPreview();
+      renderDashboardLite();
+    }
+
+    document.addEventListener("DOMContentLoaded", () => {
+      carregarTudo();
+
+      $("orcData").value = hojeISO();
+      $("orcValidade").value = addDias(hojeISO(), 7);
+
+      atualizarTela();
+    });
   </script>
 </body>
 </html>
